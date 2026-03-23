@@ -1,0 +1,3164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DJ Set Planner</title>
+  <style>
+    :root {
+      --bg: #0b0b12;
+      --bg2: #11111c;
+      --bg3: #181825;
+      --bg4: #1e1e2e;
+      --text: #cdd6f4;
+      --text2: #a6adc8;
+      --text3: #585b70;
+      --border: #313244;
+      --border2: #45475a;
+      --accent: #cba6f7;
+      --accent2: #89b4fa;
+      --green: #a6e3a1;
+      --yellow: #f9e2af;
+      --red: #f38ba8;
+      --teal: #94e2d5;
+      --pink: #f5c2e7;
+      --sky: #89dceb;
+      --deck-a: #89b4fa;
+      --deck-b: #cba6f7;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      font-size: 14px;
+      padding-bottom: 280px;
+    }
+
+    /* HEADER */
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      background: rgba(11,11,18,0.92);
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #cba6f7, #89b4fa);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .logo h1 {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #cba6f7, #89b4fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.3px;
+    }
+    .logo span {
+      font-size: 12px;
+      color: var(--text3);
+      font-weight: 400;
+      display: block;
+      margin-top: -2px;
+    }
+    .header-stats {
+      display: flex;
+      gap: 20px;
+      font-size: 12px;
+      color: var(--text3);
+    }
+    .header-stats b { color: var(--text2); }
+
+    /* CONTROLS */
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+      max-width: 300px;
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text3);
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 12px 7px 32px;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--text3); }
+
+    .filter-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--text2);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .pill:hover { border-color: var(--border2); color: var(--text); }
+    .pill.active {
+      background: rgba(203, 166, 247, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .sort-wrap {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .sort-label { font-size: 11px; color: var(--text3); }
+    .sort-btn {
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--text2);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .sort-btn:hover { border-color: var(--border2); color: var(--text); }
+    .sort-btn.active {
+      background: rgba(137, 180, 250, 0.15);
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    .view-toggle {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .view-btn {
+      padding: 6px 10px;
+      background: var(--bg3);
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 14px;
+    }
+    .view-btn.active { background: var(--bg4); color: var(--text); }
+
+    /* MAIN LAYOUT */
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 0;
+      min-height: calc(100vh - 130px);
+    }
+
+    /* SONG AREA */
+    .song-area { padding: 20px 24px; }
+    .song-count {
+      font-size: 12px;
+      color: var(--text3);
+      margin-bottom: 14px;
+    }
+    .song-count b { color: var(--text2); }
+
+    /* CARD GRID */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+
+    .song-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .song-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--camelot-color, #555);
+      border-radius: 3px 0 0 3px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .song-card:hover {
+      border-color: var(--border2);
+      background: var(--bg4);
+      transform: translateY(-1px);
+    }
+    .song-card:hover::before { opacity: 1; }
+    .song-card.selected {
+      border-color: #f9e2af;
+      background: rgba(249, 226, 175, 0.06);
+      box-shadow: 0 0 20px rgba(249,226,175,0.08);
+    }
+    .song-card.compatible {
+      border-color: #a6e3a1;
+      background: rgba(166, 227, 161, 0.06);
+      box-shadow: 0 0 16px rgba(166,227,161,0.08);
+    }
+    .song-card.incompatible { opacity: 0.35; }
+    .song-card[draggable="true"] { cursor: grab; }
+    .song-card[draggable="true"]:active { cursor: grabbing; }
+    .song-card.dragging { opacity: 0.4; transform: scale(0.97); }
+    .deck.deck-drag-over { outline: 2px dashed var(--accent2); outline-offset: -4px; background: rgba(137,180,250,0.04); }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .card-titles {}
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+      margin-bottom: 2px;
+    }
+    .card-artist {
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    .camelot-badge {
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.3);
+      color: var(--camelot-color, #fff);
+      border: 1px solid var(--camelot-color, #555);
+      min-width: 38px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--text3);
+      background: var(--bg2);
+      padding: 3px 7px;
+      border-radius: 4px;
+    }
+    .meta-item b { color: var(--text2); font-weight: 600; }
+
+    .genre-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .energy-bar {
+      display: flex;
+      gap: 2px;
+      align-items: center;
+    }
+    .energy-pip {
+      width: 16px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      transition: background 0.2s;
+    }
+    .energy-pip.on { background: var(--pip-color, #cba6f7); }
+
+    .compat-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      display: none;
+    }
+    .song-card.compatible .compat-indicator { display: block; }
+
+    /* DECK LOAD BUTTONS */
+    .card-deck-btns {
+      display: flex;
+      gap: 5px;
+      margin-top: 10px;
+      justify-content: flex-end;
+    }
+    .deck-load-btn {
+      padding: 3px 9px;
+      border-radius: 5px;
+      border: 1px solid var(--border2);
+      background: var(--bg2);
+      color: var(--text3);
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.5px;
+    }
+    .deck-load-btn:hover { border-color: var(--deck-a); color: var(--deck-a); }
+    .deck-load-btn.btn-b:hover { border-color: var(--deck-b); color: var(--deck-b); }
+
+    /* TABLE VIEW */
+    .song-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .song-table th {
+      text-align: left;
+      padding: 8px 12px;
+      color: var(--text3);
+      font-weight: 500;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .song-table th.sortable { cursor: pointer; }
+    .song-table th.sortable:hover { color: var(--text2); }
+    .song-table th.sort-active { color: var(--accent2); }
+    .song-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .song-table tr {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .song-table tr:hover td { background: var(--bg3); }
+    .song-table tr.selected td { background: rgba(249,226,175,0.05); }
+    .song-table tr.compatible td { background: rgba(166,227,161,0.05); }
+    .song-table tr.incompatible { opacity: 0.35; }
+    .song-table .title-cell { font-weight: 600; }
+    .song-table .artist-cell { color: var(--text3); }
+    .song-table .camelot-cell {
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--camelot-color);
+    }
+    .table-deck-btns {
+      display: flex;
+      gap: 4px;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      border-left: 1px solid var(--border);
+      padding: 20px;
+      position: sticky;
+      top: 130px;
+      height: calc(100vh - 130px);
+      overflow-y: auto;
+    }
+    .sidebar h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text3);
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+
+    /* CAMELOT WHEEL */
+    .wheel-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    #camelotWheel { cursor: pointer; }
+
+    .wheel-legend {
+      font-size: 11px;
+      color: var(--text3);
+      text-align: center;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    /* SELECTED SONG PANEL */
+    .selected-panel {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .selected-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .selected-artist {
+      font-size: 12px;
+      color: var(--text3);
+      margin-bottom: 12px;
+    }
+    .selected-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .info-box {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    .info-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+    .info-value { font-size: 15px; font-weight: 700; color: var(--text); }
+    .info-value.camelot-val { color: var(--camelot-color); }
+
+    .compat-list h4 {
+      font-size: 11px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .compat-song-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .compat-song-item:last-child { border-bottom: none; }
+    .compat-song-item:hover .compat-name { color: var(--text); }
+    .compat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .compat-name {
+      font-size: 12px;
+      color: var(--text2);
+      flex: 1;
+    }
+    .compat-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--camelot-color);
+    }
+
+    .no-selection {
+      text-align: center;
+      color: var(--text3);
+      font-size: 12px;
+      padding: 20px 0;
+    }
+
+    /* GENRE COLORS */
+    .genre-Pop { background: rgba(203,166,247,0.15); color: #cba6f7; }
+    .genre-Hip-Hop { background: rgba(243,188,114,0.15); color: #fab387; }
+    .genre-R\&B { background: rgba(249,226,175,0.15); color: #f9e2af; }
+    .genre-K-Pop { background: rgba(245,194,231,0.15); color: #f5c2e7; }
+    .genre-House { background: rgba(148,226,213,0.15); color: #94e2d5; }
+    .genre-Dance { background: rgba(137,180,250,0.15); color: #89b4fa; }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text3);
+    }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+    .empty-state p { font-size: 14px; }
+
+    /* ═══════════════════════════════════════════
+       DJ CONSOLE
+    ════════════════════════════════════════════ */
+    .dj-console {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 260px;
+      background: #0d0d18;
+      border-top: 1px solid #2a2a3e;
+      display: grid;
+      grid-template-columns: 1fr 200px 1fr;
+      gap: 0;
+      z-index: 200;
+      user-select: none;
+    }
+
+    /* DECK */
+    .deck {
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+    .deck-a { border-right: 1px solid #1e1e2e; }
+    .deck-b { border-left: 1px solid #1e1e2e; }
+
+    .deck-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .beat-led {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #1a1a2e;
+      transition: background 0.05s, box-shadow 0.05s;
+      flex-shrink: 0;
+    }
+    .beat-led.flash-a {
+      background: #89b4fa;
+      box-shadow: 0 0 10px #89b4fa, 0 0 20px rgba(137,180,250,0.4);
+    }
+    .beat-led.flash-b {
+      background: #cba6f7;
+      box-shadow: 0 0 10px #cba6f7, 0 0 20px rgba(203,166,247,0.4);
+    }
+    .deck-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .deck-a .deck-label { color: var(--deck-a); }
+    .deck-b .deck-label { color: var(--deck-b); }
+
+    .deck-song-info {
+      flex: 1;
+      overflow: hidden;
+    }
+    .deck-song-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+    .deck-song-artist {
+      font-size: 10px;
+      color: var(--text3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .deck-camelot-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid;
+      flex-shrink: 0;
+    }
+    .deck-a .deck-camelot-badge { color: var(--deck-a); border-color: var(--deck-a); }
+    .deck-b .deck-camelot-badge { color: var(--deck-b); border-color: var(--deck-b); }
+
+    /* VISUALIZER */
+    .deck-visualizer {
+      height: 46px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #0b0b12;
+      flex-shrink: 0;
+    }
+    .deck-visualizer canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* TRANSPORT */
+    .transport-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .play-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
+      font-size: 12px;
+      color: inherit;
+    }
+    .deck-a .play-btn { border-color: var(--deck-a); color: var(--deck-a); }
+    .deck-b .play-btn { border-color: var(--deck-b); color: var(--deck-b); }
+    .play-btn:hover { opacity: 0.8; transform: scale(1.05); }
+    .play-btn.playing {
+      background: var(--deck-a);
+      color: #0b0b12;
+    }
+    .deck-b .play-btn.playing {
+      background: var(--deck-b);
+    }
+
+    .bpm-display {
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 48px;
+      text-align: center;
+    }
+    .deck-a .bpm-display { color: var(--deck-a); }
+    .deck-b .bpm-display { color: var(--deck-b); }
+
+    .pitch-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .pitch-label {
+      font-size: 9px;
+      color: var(--text3);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .pitch-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 3px;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    .deck-a .pitch-slider { background: #1e2a3a; accent-color: var(--deck-a); }
+    .deck-b .pitch-slider { background: #2a1e3a; accent-color: var(--deck-b); }
+    .pitch-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .deck-a .pitch-slider::-webkit-slider-thumb { background: var(--deck-a); }
+    .deck-b .pitch-slider::-webkit-slider-thumb { background: var(--deck-b); }
+
+    /* EQ */
+    .eq-section {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      height: 56px;
+    }
+    .eq-band {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      flex: 1;
+    }
+    .eq-label {
+      font-size: 9px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .eq-slider {
+      -webkit-appearance: slider-vertical;
+      appearance: none;
+      writing-mode: vertical-lr;
+      direction: rtl;
+      width: 6px;
+      height: 40px;
+      outline: none;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .deck-a .eq-slider { accent-color: var(--deck-a); }
+    .deck-b .eq-slider { accent-color: var(--deck-b); }
+    .eq-slider::-webkit-slider-runnable-track {
+      border-radius: 3px;
+    }
+    .deck-a .eq-slider::-webkit-slider-runnable-track {
+      background: linear-gradient(to top, #1e2a3a, rgba(137,180,250,0.3));
+    }
+    .deck-b .eq-slider::-webkit-slider-runnable-track {
+      background: linear-gradient(to top, #2a1e3a, rgba(203,166,247,0.3));
+    }
+    .eq-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 8px;
+      border-radius: 2px;
+      margin-left: -4px;
+      cursor: pointer;
+    }
+    .deck-a .eq-slider::-webkit-slider-thumb { background: var(--deck-a); }
+    .deck-b .eq-slider::-webkit-slider-thumb { background: var(--deck-b); }
+
+    /* STEMS */
+    .stem-row {
+      display: flex;
+      gap: 5px;
+    }
+    .stem-btn {
+      flex: 1;
+      padding: 4px 0;
+      border-radius: 4px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text3);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+    .stem-btn.active {
+      color: var(--text);
+    }
+    .deck-a .stem-btn.active {
+      border-color: var(--deck-a);
+      background: rgba(137,180,250,0.12);
+      box-shadow: 0 0 6px rgba(137,180,250,0.2);
+      color: var(--deck-a);
+    }
+    .deck-b .stem-btn.active {
+      border-color: var(--deck-b);
+      background: rgba(203,166,247,0.12);
+      box-shadow: 0 0 6px rgba(203,166,247,0.2);
+      color: var(--deck-b);
+    }
+    .stem-btn.muted {
+      text-decoration: line-through;
+      opacity: 0.4;
+    }
+
+    /* VOLUME FADER */
+    .vol-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .vol-label {
+      font-size: 9px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: 22px;
+      flex-shrink: 0;
+    }
+    .vol-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    .deck-a .vol-slider { background: linear-gradient(to right, #1e2a3a, rgba(137,180,250,0.4)); accent-color: var(--deck-a); }
+    .deck-b .vol-slider { background: linear-gradient(to right, #2a1e3a, rgba(203,166,247,0.4)); accent-color: var(--deck-b); }
+    .vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .deck-a .vol-slider::-webkit-slider-thumb { background: var(--deck-a); box-shadow: 0 0 6px rgba(137,180,250,0.5); }
+    .deck-b .vol-slider::-webkit-slider-thumb { background: var(--deck-b); box-shadow: 0 0 6px rgba(203,166,247,0.5); }
+
+    /* DROP ZONE */
+    .drop-zone {
+      font-size: 10px;
+      color: var(--text3);
+      text-align: center;
+      padding: 3px;
+      border: 1px dashed var(--border);
+      border-radius: 5px;
+      cursor: default;
+      transition: all 0.15s;
+    }
+    .drop-zone.dragover {
+      border-color: var(--accent2);
+      color: var(--accent2);
+      background: rgba(137,180,250,0.05);
+    }
+    .drop-zone.has-file {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* MASTER SECTION */
+    .master-section {
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      border-left: 1px solid #1e1e2e;
+      border-right: 1px solid #1e1e2e;
+    }
+    .master-label {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .crossfader-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .crossfader-ab {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .crossfader-ab .a-label { color: var(--deck-a); }
+    .crossfader-ab .b-label { color: var(--deck-b); }
+    .crossfader {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(to right, rgba(137,180,250,0.5), rgba(203,166,247,0.5));
+      outline: none;
+      cursor: pointer;
+      accent-color: #cdd6f4;
+    }
+    .crossfader::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      background: #cdd6f4;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .sync-btn {
+      width: 100%;
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text2);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+    .sync-btn:hover {
+      border-color: var(--yellow);
+      color: var(--yellow);
+      background: rgba(249,226,175,0.08);
+    }
+
+    .master-vol-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .master-vol-label {
+      font-size: 9px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .master-vol-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: linear-gradient(to right, var(--bg4), rgba(205,214,244,0.4));
+      outline: none;
+      cursor: pointer;
+      accent-color: #cdd6f4;
+    }
+    .master-vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #cdd6f4;
+      cursor: pointer;
+    }
+
+    .synth-notice {
+      font-size: 8.5px;
+      color: var(--text3);
+      text-align: center;
+      line-height: 1.5;
+      padding: 4px 6px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: rgba(255,255,255,0.02);
+      width: 100%;
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #585b70; }
+
+    .spotify-auth-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: none;
+      background: #1db954;
+      color: #000;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .spotify-auth-btn:hover { background: #1ed760; }
+    .spotify-redirect-hint {
+      font-size: 10px;
+      color: var(--text3);
+      max-width: 220px;
+    }
+    .spotify-connected-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .spotify-connected-label {
+      font-size: 12px;
+      color: #1db954;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .spotify-discover-btn {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid #1db954;
+      background: rgba(29,185,84,0.12);
+      color: #1db954;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .spotify-discover-btn:hover { background: rgba(29,185,84,0.25); }
+    .spotify-reconnect-btn {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid #f38ba8;
+      background: rgba(243,139,168,0.1);
+      color: #f38ba8;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .spotify-reconnect-btn:hover { background: rgba(243,139,168,0.2); }
+
+    /* Progress bar */
+    .spotify-progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(29,185,84,0.2);
+      z-index: 9999;
+      display: none;
+    }
+    .spotify-progress-bar-fill {
+      height: 100%;
+      background: #1db954;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+    .spotify-progress-label {
+      font-size: 11px;
+      color: #1db954;
+      white-space: nowrap;
+    }
+
+    /* Preview badge on song cards */
+    .preview-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(29,185,84,0.15);
+      border: 1px solid rgba(29,185,84,0.4);
+      color: #1db954;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 10px;
+      cursor: default;
+    }
+
+    /* Deck source label */
+    .deck-source-label {
+      font-size: 9px;
+      letter-spacing: 0.3px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .deck-source-label.spotify {
+      background: rgba(29,185,84,0.15);
+      color: #1db954;
+      border: 1px solid rgba(29,185,84,0.3);
+    }
+    .deck-source-label.synth {
+      background: rgba(137,180,250,0.1);
+      color: var(--text3);
+      border: 1px solid var(--border);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 280px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1e1e2e;
+      border: 1px solid #1db954;
+      color: #1db954;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 9998;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+    }
+    @media (max-width: 600px) {
+      .header { padding: 14px 16px 12px; }
+      .song-area { padding: 14px 16px; }
+      .card-grid { grid-template-columns: 1fr; }
+      .controls { gap: 8px; }
+      .dj-console { grid-template-columns: 1fr; height: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-icon">🎧</div>
+      <div>
+        <h1>DJ Set Planner</h1>
+        <span>Harmonic mixing &amp; key compatibility</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div class="header-stats">
+        <span><b id="totalCount">0</b> tracks</span>
+        <span><b id="visibleCount">0</b> showing</span>
+        <span><b id="compatCount">0</b> compatible</span>
+        <span id="spotifyProgressLabel" class="spotify-progress-label" style="display:none"></span>
+      </div>
+      <!-- Spotify UI -->
+      <div class="spotify-area" id="spotifyArea">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" class="search-input" placeholder="Search tracks..." id="searchInput">
+    </div>
+    <div class="filter-pills" id="genreFilters"></div>
+    <div class="sort-wrap">
+      <span class="sort-label">Sort:</span>
+      <button class="sort-btn active" data-sort="title">Title</button>
+      <button class="sort-btn" data-sort="bpm">BPM</button>
+      <button class="sort-btn" data-sort="camelot">Key</button>
+      <button class="sort-btn" data-sort="energy">Energy</button>
+    </div>
+    <div class="view-toggle">
+      <button class="view-btn active" id="gridViewBtn" title="Grid view">⊞</button>
+      <button class="view-btn" id="listViewBtn" title="List view">☰</button>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="song-area">
+    <div class="song-count">Showing <b id="songCountText">0</b> tracks · Click any track to find harmonic matches</div>
+    <div id="songContainer"></div>
+  </div>
+  <aside class="sidebar">
+    <h3>Camelot Wheel</h3>
+    <div class="wheel-container">
+      <canvas id="camelotWheel" width="240" height="240"></canvas>
+    </div>
+    <div class="wheel-legend">Inner ring = minor (A) · Outer ring = major (B)<br>Adjacent keys mix harmonically</div>
+    <div id="sidebarContent">
+      <div class="no-selection">
+        <div style="font-size:32px;margin-bottom:8px;opacity:0.3">🎵</div>
+        <p>Select a track to see<br>harmonic matches</p>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- DJ CONSOLE -->
+<div class="dj-console" id="djConsole">
+
+  <!-- DECK A -->
+  <div class="deck deck-a" id="deckAEl">
+    <div class="deck-header">
+      <div class="beat-led" id="ledA"></div>
+      <span class="deck-label">A</span>
+      <div class="deck-song-info">
+        <div class="deck-song-title" id="deckASongTitle">No track loaded</div>
+        <div class="deck-song-artist" id="deckASongArtist">Drop a file or load from library</div>
+      </div>
+      <div class="deck-camelot-badge" id="deckACamelot" style="display:none"></div>
+      <div class="deck-source-label synth" id="deckASourceLabel" style="display:none"></div>
+    </div>
+    <div class="deck-visualizer">
+      <canvas id="vizA"></canvas>
+    </div>
+    <div class="transport-row">
+      <button class="play-btn" id="playBtnA" title="Play/Pause">&#9654;</button>
+      <span class="bpm-display" id="bpmDisplayA">— BPM</span>
+      <div class="pitch-wrap">
+        <span class="pitch-label">Pitch ±8%</span>
+        <input type="range" class="pitch-slider" id="pitchA" min="-8" max="8" step="0.1" value="0">
+      </div>
+    </div>
+    <div class="eq-section">
+      <div class="eq-band">
+        <span class="eq-label">Hi</span>
+        <input type="range" class="eq-slider" id="eqAHi" min="-15" max="15" step="0.5" value="0">
+      </div>
+      <div class="eq-band">
+        <span class="eq-label">Mid</span>
+        <input type="range" class="eq-slider" id="eqAMid" min="-15" max="15" step="0.5" value="0">
+      </div>
+      <div class="eq-band">
+        <span class="eq-label">Low</span>
+        <input type="range" class="eq-slider" id="eqALow" min="-15" max="15" step="0.5" value="0">
+      </div>
+      <div style="flex:3"></div>
+      <div class="stem-row" style="flex:5" id="stemRowA">
+        <button class="stem-btn active" data-stem="drums" data-deck="a">DRUMS</button>
+        <button class="stem-btn active" data-stem="bass" data-deck="a">BASS</button>
+        <button class="stem-btn active" data-stem="pad" data-deck="a">PAD</button>
+      </div>
+    </div>
+    <div class="vol-row">
+      <span class="vol-label">VOL</span>
+      <input type="range" class="vol-slider" id="volA" min="0" max="1" step="0.01" value="0.8">
+    </div>
+    <div class="drop-zone" id="dropZoneA">Drop audio file here (MP3/WAV)</div>
+  </div>
+
+  <!-- MASTER -->
+  <div class="master-section">
+    <span class="master-label">Master</span>
+    <div class="crossfader-wrap">
+      <div class="crossfader-ab">
+        <span class="a-label">A</span>
+        <span class="b-label">B</span>
+      </div>
+      <input type="range" class="crossfader" id="crossfader" min="0" max="1" step="0.01" value="0.5">
+    </div>
+    <button class="sync-btn" id="syncBtn">SYNC BPM</button>
+    <div class="master-vol-wrap">
+      <span class="master-vol-label">Master Vol</span>
+      <input type="range" class="master-vol-slider" id="masterVol" min="0" max="1" step="0.01" value="0.85">
+    </div>
+    <div class="synth-notice">
+      SYNTHESIZED AUDIO<br>Drop your own MP3/WAV<br>onto a deck for real playback
+    </div>
+  </div>
+
+  <!-- DECK B -->
+  <div class="deck deck-b" id="deckBEl">
+    <div class="deck-header">
+      <div class="beat-led" id="ledB"></div>
+      <span class="deck-label">B</span>
+      <div class="deck-song-info">
+        <div class="deck-song-title" id="deckBSongTitle">No track loaded</div>
+        <div class="deck-song-artist" id="deckBSongArtist">Drop a file or load from library</div>
+      </div>
+      <div class="deck-camelot-badge" id="deckBCamelot" style="display:none"></div>
+      <div class="deck-source-label synth" id="deckBSourceLabel" style="display:none"></div>
+    </div>
+    <div class="deck-visualizer">
+      <canvas id="vizB"></canvas>
+    </div>
+    <div class="transport-row">
+      <button class="play-btn" id="playBtnB" title="Play/Pause">&#9654;</button>
+      <span class="bpm-display" id="bpmDisplayB">— BPM</span>
+      <div class="pitch-wrap">
+        <span class="pitch-label">Pitch ±8%</span>
+        <input type="range" class="pitch-slider" id="pitchB" min="-8" max="8" step="0.1" value="0">
+      </div>
+    </div>
+    <div class="eq-section">
+      <div class="eq-band">
+        <span class="eq-label">Hi</span>
+        <input type="range" class="eq-slider" id="eqBHi" min="-15" max="15" step="0.5" value="0">
+      </div>
+      <div class="eq-band">
+        <span class="eq-label">Mid</span>
+        <input type="range" class="eq-slider" id="eqBMid" min="-15" max="15" step="0.5" value="0">
+      </div>
+      <div class="eq-band">
+        <span class="eq-label">Low</span>
+        <input type="range" class="eq-slider" id="eqBLow" min="-15" max="15" step="0.5" value="0">
+      </div>
+      <div style="flex:3"></div>
+      <div class="stem-row" style="flex:5" id="stemRowB">
+        <button class="stem-btn active" data-stem="drums" data-deck="b">DRUMS</button>
+        <button class="stem-btn active" data-stem="bass" data-deck="b">BASS</button>
+        <button class="stem-btn active" data-stem="pad" data-deck="b">PAD</button>
+      </div>
+    </div>
+    <div class="vol-row">
+      <span class="vol-label">VOL</span>
+      <input type="range" class="vol-slider" id="volB" min="0" max="1" step="0.01" value="0.8">
+    </div>
+    <div class="drop-zone" id="dropZoneB">Drop audio file here (MP3/WAV)</div>
+  </div>
+
+</div>
+
+<!-- Spotify progress bar -->
+<div class="spotify-progress-bar" id="spotifyProgressBar">
+  <div class="spotify-progress-bar-fill" id="spotifyProgressFill"></div>
+</div>
+<!-- Toast notification -->
+<div class="toast" id="toastEl"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// CAMELOT COLOR MAP
+// ══════════════════════════════════════════════
+const CAMELOT_COLORS = {
+  '1':  '#ff6b6b', '2':  '#ff9f43', '3':  '#ffd32a',
+  '4':  '#c4e538', '5':  '#1dd1a1', '6':  '#00d2d3',
+  '7':  '#54a0ff', '8':  '#5f27cd', '9':  '#a29bfe',
+  '10': '#fd79a8', '11': '#e84393', '12': '#b83b5e'
+};
+
+// ══════════════════════════════════════════════
+// SONG DATABASE (65 tracks)
+// ══════════════════════════════════════════════
+const SONGS = [
+  // POP
+  { id:1,  title:"Espresso",              artist:"Sabrina Carpenter",         bpm:104, key:"F major",    camelot:"7B",  energy:7, genre:"Pop" },
+  { id:2,  title:"Please Please Please",  artist:"Sabrina Carpenter",         bpm:107, key:"G major",    camelot:"9B",  energy:6, genre:"Pop" },
+  { id:3,  title:"Taste",                 artist:"Sabrina Carpenter",         bpm:107, key:"A minor",    camelot:"8A",  energy:8, genre:"Pop" },
+  { id:4,  title:"Die With A Smile",      artist:"Lady Gaga & Bruno Mars",    bpm:90,  key:"Bb major",   camelot:"6B",  energy:6, genre:"Pop" },
+  { id:5,  title:"Beautiful Things",      artist:"Benson Boone",              bpm:120, key:"D major",    camelot:"10B", energy:8, genre:"Pop" },
+  { id:6,  title:"Too Sweet",             artist:"Hozier",                    bpm:106, key:"Db major",   camelot:"3B",  energy:5, genre:"Pop" },
+  { id:7,  title:"Lose Control",          artist:"Teddy Swims",               bpm:106, key:"Bb major",   camelot:"6B",  energy:7, genre:"Pop" },
+  { id:8,  title:"Cruel Summer",          artist:"Taylor Swift",              bpm:170, key:"A major",    camelot:"11B", energy:9, genre:"Pop" },
+  { id:9,  title:"Flowers",              artist:"Miley Cyrus",               bpm:120, key:"Eb major",   camelot:"5B",  energy:8, genre:"Pop" },
+  { id:10, title:"Unholy",               artist:"Sam Smith & Kim Petras",    bpm:133, key:"F minor",    camelot:"4A",  energy:8, genre:"Pop" },
+  { id:11, title:"Anti-Hero",            artist:"Taylor Swift",              bpm:97,  key:"F major",    camelot:"7B",  energy:8, genre:"Pop" },
+  { id:12, title:"Harlequin",            artist:"Lady Gaga",                 bpm:141, key:"A minor",    camelot:"8A",  energy:9, genre:"Pop" },
+  // HIP-HOP
+  { id:13, title:"Not Like Us",          artist:"Kendrick Lamar",            bpm:100, key:"F minor",    camelot:"4A",  energy:9, genre:"Hip-Hop" },
+  { id:14, title:"Luther",               artist:"Kendrick Lamar & SZA",      bpm:92,  key:"Db major",   camelot:"3B",  energy:7, genre:"Hip-Hop" },
+  { id:15, title:"Squabble Up",          artist:"Kendrick Lamar",            bpm:92,  key:"Bb major",   camelot:"6B",  energy:8, genre:"Hip-Hop" },
+  { id:16, title:"Big Dawgs",            artist:"Hanumankind",               bpm:143, key:"F# minor",   camelot:"11A", energy:9, genre:"Hip-Hop" },
+  { id:17, title:"Wanna Be",             artist:"GloRilla & Megan Thee Stallion", bpm:100, key:"G# minor", camelot:"1A", energy:9, genre:"Hip-Hop" },
+  { id:18, title:"CARNIVAL",             artist:"Kanye West & Ty Dolla $ign",bpm:108, key:"G minor",    camelot:"6A",  energy:8, genre:"Hip-Hop" },
+  { id:19, title:"Timeless",             artist:"The Weeknd & Playboi Carti",bpm:140, key:"A minor",    camelot:"8A",  energy:8, genre:"Hip-Hop" },
+  { id:20, title:"Rich Flex",            artist:"Drake & 21 Savage",         bpm:140, key:"G minor",    camelot:"6A",  energy:8, genre:"Hip-Hop" },
+  { id:21, title:"Creepin'",             artist:"Metro Boomin & The Weeknd", bpm:96,  key:"A minor",    camelot:"8A",  energy:7, genre:"Hip-Hop" },
+  { id:22, title:"Type Shit",            artist:"Future, Metro Boomin & Travis Scott", bpm:140, key:"A minor", camelot:"8A", energy:9, genre:"Hip-Hop" },
+  // R&B
+  { id:23, title:"Snooze",               artist:"SZA",                       bpm:100, key:"F# minor",   camelot:"11A", energy:6, genre:"R&B" },
+  { id:24, title:"Kill Bill",            artist:"SZA",                       bpm:89,  key:"G minor",    camelot:"6A",  energy:7, genre:"R&B" },
+  { id:25, title:"Saturn",               artist:"SZA",                       bpm:104, key:"Db major",   camelot:"3B",  energy:6, genre:"R&B" },
+  { id:26, title:"Good Luck, Babe!",     artist:"Chappell Roan",             bpm:107, key:"D major",    camelot:"10B", energy:8, genre:"R&B" },
+  { id:27, title:"Pink Pony Club",       artist:"Chappell Roan",             bpm:128, key:"Bb major",   camelot:"6B",  energy:9, genre:"R&B" },
+  { id:28, title:"HOT TO GO!",           artist:"Chappell Roan",             bpm:144, key:"D minor",    camelot:"7A",  energy:9, genre:"R&B" },
+  { id:29, title:"Von Dutch",            artist:"Charli XCX",                bpm:136, key:"F# minor",   camelot:"11A", energy:9, genre:"R&B" },
+  { id:30, title:"360",                  artist:"Charli XCX",                bpm:128, key:"A minor",    camelot:"8A",  energy:9, genre:"R&B" },
+  { id:31, title:"As It Was",            artist:"Harry Styles",              bpm:174, key:"A minor",    camelot:"8A",  energy:8, genre:"R&B" },
+  { id:32, title:"Karma (feat. Ice Spice)", artist:"Taylor Swift",           bpm:154, key:"G# minor",   camelot:"1A",  energy:8, genre:"R&B" },
+  // K-POP
+  { id:33, title:"APT.",                 artist:"ROSÉ & Bruno Mars",         bpm:113, key:"F major",    camelot:"7B",  energy:8, genre:"K-Pop" },
+  { id:34, title:"Magnetic",             artist:"ILLIT",                     bpm:115, key:"A minor",    camelot:"8A",  energy:7, genre:"K-Pop" },
+  { id:35, title:"How Sweet",            artist:"NewJeans",                  bpm:106, key:"Eb major",   camelot:"5B",  energy:7, genre:"K-Pop" },
+  { id:36, title:"Supernova",            artist:"aespa",                     bpm:132, key:"B minor",    camelot:"10A", energy:9, genre:"K-Pop" },
+  { id:37, title:"SHEESH",               artist:"BABYMONSTER",               bpm:140, key:"F minor",    camelot:"4A",  energy:9, genre:"K-Pop" },
+  { id:38, title:"Crazy",                artist:"LE SSERAFIM",               bpm:130, key:"C# minor",   camelot:"12A", energy:8, genre:"K-Pop" },
+  { id:39, title:"Mantra",               artist:"JENNIE",                    bpm:114, key:"D minor",    camelot:"7A",  energy:8, genre:"K-Pop" },
+  { id:40, title:"Sticky",               artist:"KISS OF LIFE",              bpm:104, key:"F major",    camelot:"7B",  energy:8, genre:"K-Pop" },
+  { id:41, title:"Whiplash",             artist:"aespa",                     bpm:128, key:"F# minor",   camelot:"11A", energy:9, genre:"K-Pop" },
+  { id:42, title:"Drama",                artist:"aespa",                     bpm:120, key:"A major",    camelot:"11B", energy:8, genre:"K-Pop" },
+  { id:43, title:"GODS",                 artist:"NewJeans",                  bpm:122, key:"D major",    camelot:"10B", energy:7, genre:"K-Pop" },
+  // HOUSE
+  { id:44, title:"(It Goes Like) Nanana",artist:"Peggy Gou",                 bpm:126, key:"F minor",    camelot:"4A",  energy:8, genre:"House" },
+  { id:45, title:"Escape",               artist:"Bicep",                     bpm:125, key:"A minor",    camelot:"8A",  energy:8, genre:"House" },
+  { id:46, title:"Dancing In Circles",   artist:"Fred Again..",              bpm:128, key:"C major",    camelot:"8B",  energy:8, genre:"House" },
+  { id:47, title:"Jungle",               artist:"Fred Again.. & Skrillex",   bpm:130, key:"F# minor",   camelot:"11A", energy:9, genre:"House" },
+  { id:48, title:"Delicious",            artist:"Fred Again.. & Romy",       bpm:128, key:"Bb major",   camelot:"6B",  energy:8, genre:"House" },
+  { id:49, title:"Lose It",              artist:"Fisher",                    bpm:129, key:"F minor",    camelot:"4A",  energy:9, genre:"House" },
+  { id:50, title:"One More Time",        artist:"Daft Punk",                 bpm:123, key:"F major",    camelot:"7B",  energy:9, genre:"House" },
+  { id:51, title:"Around The World",     artist:"Daft Punk",                 bpm:121, key:"Bb minor",   camelot:"3A",  energy:8, genre:"House" },
+  { id:52, title:"La Femme",             artist:"Purple Disco Machine",      bpm:124, key:"G minor",    camelot:"6A",  energy:8, genre:"House" },
+  { id:53, title:"Hypnotised",           artist:"Purple Disco Machine",      bpm:120, key:"F major",    camelot:"7B",  energy:8, genre:"House" },
+  { id:54, title:"Never Felt So Right",  artist:"Disclosure",                bpm:124, key:"D minor",    camelot:"7A",  energy:8, genre:"House" },
+  // DANCE
+  { id:55, title:"Break My Soul",        artist:"Beyoncé",                   bpm:127, key:"Bb major",   camelot:"6B",  energy:9, genre:"Dance" },
+  { id:56, title:"Levitating",           artist:"Dua Lipa",                  bpm:103, key:"B minor",    camelot:"10A", energy:8, genre:"Dance" },
+  { id:57, title:"Don't Start Now",      artist:"Dua Lipa",                  bpm:124, key:"B minor",    camelot:"10A", energy:8, genre:"Dance" },
+  { id:58, title:"Dance The Night",      artist:"Dua Lipa",                  bpm:111, key:"E minor",    camelot:"9A",  energy:8, genre:"Dance" },
+  { id:59, title:"Padam Padam",          artist:"Kylie Minogue",             bpm:120, key:"Db major",   camelot:"3B",  energy:8, genre:"Dance" },
+  { id:60, title:"Telephone",            artist:"Lady Gaga & Beyoncé",       bpm:122, key:"B minor",    camelot:"10A", energy:9, genre:"Dance" },
+  { id:61, title:"Run The World (Girls)",artist:"Beyoncé",                   bpm:132, key:"D minor",    camelot:"7A",  energy:9, genre:"Dance" },
+  { id:62, title:"Gimme More",           artist:"Britney Spears",            bpm:101, key:"G minor",    camelot:"6A",  energy:8, genre:"Dance" },
+  { id:63, title:"Toxic",                artist:"Britney Spears",            bpm:143, key:"Cm / Eb",    camelot:"5A",  energy:9, genre:"Dance" },
+  { id:64, title:"Scream & Shout",       artist:"will.i.am & Britney Spears",bpm:130, key:"G# minor",   camelot:"1A",  energy:8, genre:"Dance" },
+  { id:65, title:"Clarity",              artist:"Zedd feat. Foxes",          bpm:128, key:"F# minor",   camelot:"11A", energy:9, genre:"Dance" },
+];
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let state = {
+  selectedId: null,
+  activeGenre: 'All',
+  sortBy: 'title',
+  sortDir: 1,
+  searchQuery: '',
+  viewMode: 'grid',
+};
+
+// ══════════════════════════════════════════════
+// CAMELOT HELPERS
+// ══════════════════════════════════════════════
+function getCamelotNum(c) { return parseInt(c.match(/\d+/)[0]); }
+function getCamelotLetter(c) { return c.slice(-1); }
+
+function getCompatibleCamelots(camelot) {
+  const num = getCamelotNum(camelot);
+  const letter = getCamelotLetter(camelot);
+  const otherLetter = letter === 'A' ? 'B' : 'A';
+  const prev = ((num - 2 + 12) % 12) + 1;
+  const next = (num % 12) + 1;
+  return new Set([camelot, `${num}${otherLetter}`, `${prev}${letter}`, `${next}${letter}`]);
+}
+
+function camelotColor(c) {
+  return CAMELOT_COLORS[getCamelotNum(c).toString()] || '#888';
+}
+
+function compatType(selected, candidate) {
+  const sNum = getCamelotNum(selected), sL = getCamelotLetter(selected);
+  const cNum = getCamelotNum(candidate), cL = getCamelotLetter(candidate);
+  if (selected === candidate) return 'perfect';
+  if (sNum === cNum && sL !== cL) return 'relative';
+  if (Math.abs(sNum - cNum) === 1 || Math.abs(sNum - cNum) === 11) return 'adjacent';
+  return null;
+}
+
+const GENRE_PIP_COLORS = {
+  'Pop': '#cba6f7', 'Hip-Hop': '#fab387', 'R&B': '#f9e2af',
+  'K-Pop': '#f5c2e7', 'House': '#94e2d5', 'Dance': '#89b4fa',
+};
+
+// ══════════════════════════════════════════════
+// AUDIO ENGINE
+// ══════════════════════════════════════════════
+let audioCtx = null;
+let masterGainNode = null;
+
+function initAudioCtx() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  masterGainNode = audioCtx.createGain();
+  masterGainNode.gain.value = parseFloat(document.getElementById('masterVol').value);
+  masterGainNode.connect(audioCtx.destination);
+}
+
+// Key root frequencies (Hz, one octave below middle)
+const ROOT_FREQS = {
+  'C':130.81,'C#':138.59,'Db':138.59,'D':146.83,'D#':155.56,'Eb':155.56,
+  'E':164.81,'F':174.61,'F#':185.00,'Gb':185.00,'G':196.00,'G#':207.65,
+  'Ab':207.65,'A':220.00,'A#':233.08,'Bb':233.08,'B':246.94
+};
+
+function parseKey(keyStr) {
+  // e.g. "F# minor", "Bb major", "Cm / Eb", camelot "11A"/"11B"
+  const match = keyStr.match(/^([A-G][b#]?)/);
+  if (!match) return { root: 'C', isMinor: false };
+  const root = match[1];
+  const isMinor = /minor|m\b/i.test(keyStr);
+  return { root, isMinor };
+}
+
+function semitoneUp(freq, n) {
+  return freq * Math.pow(2, n / 12);
+}
+
+// Drum patterns per genre
+const DRUM_PATTERNS = {
+  'House':  { kick:[0,4,8,12], snare:[4,12], hat:[2,6,10,14] },
+  'Dance':  { kick:[0,4,8,12], snare:[4,12], hat:[2,6,10,14] },
+  'Hip-Hop':{ kick:[0,3,8,11], snare:[4,12], hat:[2,4,6,8,10,12,14] },
+  'K-Pop':  { kick:[0,4,8,12], snare:[4,12], hat:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
+  'Pop':    { kick:[0,8],      snare:[4,12], hat:[2,6,10,14] },
+  'R&B':    { kick:[0,8],      snare:[4,12], hat:[2,6,10,14] },
+  '_default':{ kick:[0,8],    snare:[4,12], hat:[2,6,10,14] },
+};
+
+// Create a deck audio engine object
+function createDeck(id) {
+  const isA = id === 'a';
+  const deck = {
+    id,
+    song: null,
+    playing: false,
+    bpm: 128,
+    pitchMult: 1.0,
+    volume: 0.8,
+
+    // Web Audio nodes (created lazily)
+    analyser: null,
+    crossfadeGain: null,
+    deckGain: null,
+    highShelf: null,
+    peaking: null,
+    lowShelf: null,
+
+    // Synth state
+    schedBeat: 0,
+    schedTime: 0,
+    schedTimer: null,
+
+    // Stem states
+    stems: { drums: true, bass: true, pad: true },
+    stemGains: { drums: null, bass: null, pad: null },
+
+    // File audio
+    fileBuffer: null,
+    fileSource: null,
+    hasFile: false,
+
+    // Pad scheduling state
+    padNodes: [],
+    bassNodes: [],
+  };
+  return deck;
+}
+
+const deckA = createDeck('a');
+const deckB = createDeck('b');
+
+function getDeck(id) { return id === 'a' ? deckA : deckB; }
+
+function initDeckNodes(deck) {
+  if (deck.analyser) return;
+  initAudioCtx();
+
+  // EQ chain
+  deck.highShelf = audioCtx.createBiquadFilter();
+  deck.highShelf.type = 'highshelf';
+  deck.highShelf.frequency.value = 8000;
+  deck.highShelf.gain.value = 0;
+
+  deck.peaking = audioCtx.createBiquadFilter();
+  deck.peaking.type = 'peaking';
+  deck.peaking.frequency.value = 1000;
+  deck.peaking.Q.value = 1;
+  deck.peaking.gain.value = 0;
+
+  deck.lowShelf = audioCtx.createBiquadFilter();
+  deck.lowShelf.type = 'lowshelf';
+  deck.lowShelf.frequency.value = 250;
+  deck.lowShelf.gain.value = 0;
+
+  deck.analyser = audioCtx.createAnalyser();
+  deck.analyser.fftSize = 256;
+
+  deck.deckGain = audioCtx.createGain();
+  deck.deckGain.gain.value = deck.volume;
+
+  deck.crossfadeGain = audioCtx.createGain();
+  deck.crossfadeGain.gain.value = 1;
+
+  // Chain: analyser -> lowShelf -> peaking -> highShelf -> deckGain -> crossfadeGain -> masterGain
+  deck.analyser.connect(deck.lowShelf);
+  deck.lowShelf.connect(deck.peaking);
+  deck.peaking.connect(deck.highShelf);
+  deck.highShelf.connect(deck.deckGain);
+  deck.deckGain.connect(deck.crossfadeGain);
+  deck.crossfadeGain.connect(masterGainNode);
+
+  // Stem gain nodes
+  deck.stemGains.drums = audioCtx.createGain();
+  deck.stemGains.bass = audioCtx.createGain();
+  deck.stemGains.pad = audioCtx.createGain();
+  deck.stemGains.drums.connect(deck.analyser);
+  deck.stemGains.bass.connect(deck.analyser);
+  deck.stemGains.pad.connect(deck.analyser);
+}
+
+// ── Synthesis ──────────────────────────────────
+
+function makeNoiseBuffer(duration) {
+  const sampleRate = audioCtx.sampleRate;
+  const frameCount = Math.ceil(sampleRate * duration);
+  const buf = audioCtx.createBuffer(1, frameCount, sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < frameCount; i++) data[i] = Math.random() * 2 - 1;
+  return buf;
+}
+
+function scheduleKick(time, gainNode) {
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(150, time);
+  osc.frequency.exponentialRampToValueAtTime(40, time + 0.12);
+  g.gain.setValueAtTime(1.0, time);
+  g.gain.exponentialRampToValueAtTime(0.001, time + 0.25);
+  osc.connect(g);
+  g.connect(gainNode);
+  osc.start(time);
+  osc.stop(time + 0.3);
+}
+
+function scheduleSnare(time, gainNode) {
+  const buf = makeNoiseBuffer(0.15);
+  const src = audioCtx.createBufferSource();
+  const filt = audioCtx.createBiquadFilter();
+  const g = audioCtx.createGain();
+  src.buffer = buf;
+  filt.type = 'bandpass';
+  filt.frequency.value = 2000;
+  filt.Q.value = 0.8;
+  g.gain.setValueAtTime(0.6, time);
+  g.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+  src.connect(filt);
+  filt.connect(g);
+  g.connect(gainNode);
+  src.start(time);
+  src.stop(time + 0.2);
+}
+
+function scheduleHat(time, gainNode, isOpen) {
+  const dur = isOpen ? 0.3 : 0.05;
+  const decay = isOpen ? 0.25 : 0.04;
+  const buf = makeNoiseBuffer(dur);
+  const src = audioCtx.createBufferSource();
+  const filt = audioCtx.createBiquadFilter();
+  const g = audioCtx.createGain();
+  src.buffer = buf;
+  filt.type = 'highpass';
+  filt.frequency.value = 7000;
+  g.gain.setValueAtTime(isOpen ? 0.25 : 0.3, time);
+  g.gain.exponentialRampToValueAtTime(0.001, time + decay);
+  src.connect(filt);
+  filt.connect(g);
+  g.connect(gainNode);
+  src.start(time);
+  src.stop(time + dur + 0.05);
+}
+
+function scheduleBass(time, duration, rootFreq, gainNode) {
+  const osc = audioCtx.createOscillator();
+  const filt = audioCtx.createBiquadFilter();
+  const g = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.value = rootFreq;
+  filt.type = 'lowpass';
+  filt.frequency.value = 600;
+  g.gain.setValueAtTime(0, time);
+  g.gain.linearRampToValueAtTime(0.5, time + 0.05);
+  g.gain.setValueAtTime(0.5, time + duration - 0.1);
+  g.gain.linearRampToValueAtTime(0, time + duration);
+  osc.connect(filt);
+  filt.connect(g);
+  g.connect(gainNode);
+  osc.start(time);
+  osc.stop(time + duration + 0.05);
+  return osc;
+}
+
+function schedulePad(time, duration, rootFreq, isMinor, gainNode) {
+  const intervals = isMinor ? [0, 3, 7] : [0, 4, 7];
+  const detunes = [-5, 0, 5];
+  const nodes = [];
+  intervals.forEach((semi, i) => {
+    const freq = semitoneUp(rootFreq * 2, semi);
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    osc.detune.value = detunes[i] || 0;
+    g.gain.setValueAtTime(0, time);
+    g.gain.linearRampToValueAtTime(0.06, time + 0.3);
+    g.gain.setValueAtTime(0.06, time + duration - 0.5);
+    g.gain.linearRampToValueAtTime(0, time + duration);
+    osc.connect(g);
+    g.connect(gainNode);
+    osc.start(time);
+    osc.stop(time + duration + 0.05);
+    nodes.push(osc);
+  });
+  return nodes;
+}
+
+function scheduleDeckBeat(deck, beatPos, beatTime, sixteenthDur) {
+  if (!deck.playing || !deck.song) return;
+  const genre = deck.song.genre;
+  const pattern = DRUM_PATTERNS[genre] || DRUM_PATTERNS['_default'];
+  const pos = beatPos % 16;
+
+  if (deck.stems.drums) {
+    if (pattern.kick.includes(pos)) scheduleKick(beatTime, deck.stemGains.drums);
+    if (pattern.snare.includes(pos)) scheduleSnare(beatTime, deck.stemGains.drums);
+    if (pattern.hat.includes(pos)) scheduleHat(beatTime, deck.stemGains.drums, false);
+  }
+
+  const { root, isMinor } = parseKey(deck.song.key);
+  const rootFreq = ROOT_FREQS[root] || 130.81;
+  const barDur = sixteenthDur * 16;
+
+  if (deck.stems.bass && pos % 16 === 0) {
+    scheduleBass(beatTime, barDur, rootFreq, deck.stemGains.bass);
+  }
+  if (deck.stems.pad && beatPos % 32 === 0) {
+    schedulePad(beatTime, barDur * 2, rootFreq, isMinor, deck.stemGains.pad);
+  }
+}
+
+const LOOKAHEAD = 0.1; // seconds
+const SCHEDULE_INTERVAL = 25; // ms
+
+function startSynthScheduler(deck) {
+  if (deck.schedTimer) clearTimeout(deck.schedTimer);
+  deck.schedBeat = 0;
+  deck.schedTime = audioCtx.currentTime + 0.05;
+
+  function tick() {
+    if (!deck.playing || deck.hasFile) return;
+    const effectiveBpm = deck.bpm * deck.pitchMult;
+    const sixteenthDur = 60 / effectiveBpm / 4;
+    const scheduleUntil = audioCtx.currentTime + LOOKAHEAD;
+
+    while (deck.schedTime < scheduleUntil) {
+      const pos = deck.schedBeat % 16;
+      scheduleDeckBeat(deck, deck.schedBeat, deck.schedTime, sixteenthDur);
+
+      // Beat LED flash on beat (every 4 sixteenth notes)
+      if (pos % 4 === 0) {
+        const flashDelay = Math.max(0, (deck.schedTime - audioCtx.currentTime) * 1000);
+        const ledEl = document.getElementById('led' + deck.id.toUpperCase());
+        const flashClass = 'flash-' + deck.id;
+        setTimeout(() => {
+          if (!deck.playing) return;
+          ledEl.classList.add(flashClass);
+          setTimeout(() => ledEl.classList.remove(flashClass), 80);
+        }, flashDelay);
+      }
+
+      deck.schedBeat++;
+      deck.schedTime += sixteenthDur;
+    }
+    deck.schedTimer = setTimeout(tick, SCHEDULE_INTERVAL);
+  }
+  tick();
+}
+
+function stopSynthScheduler(deck) {
+  if (deck.schedTimer) { clearTimeout(deck.schedTimer); deck.schedTimer = null; }
+}
+
+function playDeck(deck) {
+  initAudioCtx();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  initDeckNodes(deck);
+  deck.playing = true;
+  updatePlayBtn(deck);
+  if (deck.hasFile && deck.fileBuffer) {
+    startFilePlayback(deck);
+  } else if (deck.song) {
+    startSynthScheduler(deck);
+  }
+  startVisualizer(deck);
+}
+
+function pauseDeck(deck) {
+  deck.playing = false;
+  stopSynthScheduler(deck);
+  if (deck.fileSource) {
+    try { deck.fileSource.stop(); } catch(e){}
+    deck.fileSource = null;
+  }
+  updatePlayBtn(deck);
+  const led = document.getElementById('led' + deck.id.toUpperCase());
+  led.classList.remove('flash-a', 'flash-b');
+}
+
+function updatePlayBtn(deck) {
+  const btn = document.getElementById('playBtn' + deck.id.toUpperCase());
+  if (deck.playing) {
+    btn.innerHTML = '&#9646;&#9646;';
+    btn.classList.add('playing');
+  } else {
+    btn.innerHTML = '&#9654;';
+    btn.classList.remove('playing');
+  }
+}
+
+function startFilePlayback(deck) {
+  if (deck.fileSource) { try { deck.fileSource.stop(); } catch(e){} }
+  const src = audioCtx.createBufferSource();
+  src.buffer = deck.fileBuffer;
+  src.loop = true;
+  src.connect(deck.analyser);
+  src.start();
+  deck.fileSource = src;
+  src.onended = () => { if (deck.playing) { /* loop handles it */ } };
+}
+
+// ── Load song to deck ──────────────────────────
+
+function loadSongToDeck(song, deckId) {
+  const deck = getDeck(deckId);
+  deck.song = song;
+  deck.bpm = song.bpm;
+  deck.pitchMult = 1.0;
+  document.getElementById('pitch' + deckId.toUpperCase()).value = 0;
+
+  // Update UI
+  document.getElementById('deckSongTitle' + deckId.toUpperCase()).textContent = song.title;
+  document.getElementById('deckSongArtist' + deckId.toUpperCase()).textContent = song.artist;
+  const cb = document.getElementById('deck' + deckId.toUpperCase() + 'Camelot');
+  cb.textContent = song.camelot;
+  cb.style.display = '';
+  updateBpmDisplay(deck);
+}
+
+function updateBpmDisplay(deck) {
+  const effectiveBpm = (deck.bpm * deck.pitchMult).toFixed(1);
+  document.getElementById('bpmDisplay' + deck.id.toUpperCase()).textContent = effectiveBpm + ' BPM';
+}
+
+// ── Crossfade ──────────────────────────────────
+function applyCrossfade(cf) {
+  if (!deckA.crossfadeGain || !deckB.crossfadeGain) return;
+  const gainA = Math.cos(cf * Math.PI / 2);
+  const gainB = Math.cos((1 - cf) * Math.PI / 2);
+  deckA.crossfadeGain.gain.setTargetAtTime(gainA, audioCtx.currentTime, 0.01);
+  deckB.crossfadeGain.gain.setTargetAtTime(gainB, audioCtx.currentTime, 0.01);
+}
+
+// ── EQ ─────────────────────────────────────────
+function applyEQ(deck, band, val) {
+  if (!deck[band]) return;
+  deck[band].gain.setTargetAtTime(val, audioCtx.currentTime, 0.01);
+}
+
+// ── Visualizer ─────────────────────────────────
+const vizAnimFrames = {};
+
+function startVisualizer(deck) {
+  const canvasId = 'viz' + deck.id.toUpperCase();
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const isA = deck.id === 'a';
+
+  function draw() {
+    if (!deck.playing) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Flat line when stopped
+      ctx.beginPath();
+      ctx.strokeStyle = isA ? 'rgba(137,180,250,0.3)' : 'rgba(203,166,247,0.3)';
+      ctx.lineWidth = 1;
+      ctx.moveTo(0, canvas.height / 2);
+      ctx.lineTo(canvas.width, canvas.height / 2);
+      ctx.stroke();
+      return;
+    }
+
+    const bufLen = deck.analyser ? deck.analyser.frequencyBinCount : 64;
+    const dataArr = new Uint8Array(bufLen);
+    if (deck.analyser) deck.analyser.getByteFrequencyData(dataArr);
+
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const barCount = Math.min(bufLen, 60);
+    const barW = (w / barCount) - 1;
+
+    for (let i = 0; i < barCount; i++) {
+      const val = dataArr[i] / 255;
+      const barH = val * h;
+      const x = i * (barW + 1);
+      const y = h - barH;
+
+      const t = i / barCount;
+      if (isA) {
+        // Blue/cyan gradient
+        const r = Math.round(30 + t * 60);
+        const g2 = Math.round(120 + t * 100);
+        const b = Math.round(200 + t * 55);
+        ctx.fillStyle = `rgba(${r},${g2},${b},${0.5 + val * 0.5})`;
+      } else {
+        // Purple/violet gradient
+        const r = Math.round(140 + t * 80);
+        const g2 = Math.round(50 + t * 60);
+        const b = Math.round(200 + t * 55);
+        ctx.fillStyle = `rgba(${r},${g2},${b},${0.5 + val * 0.5})`;
+      }
+      ctx.fillRect(x, y, barW, barH);
+    }
+
+    vizAnimFrames[deck.id] = requestAnimationFrame(draw);
+  }
+
+  if (vizAnimFrames[deck.id]) cancelAnimationFrame(vizAnimFrames[deck.id]);
+  // Resize canvas to match element
+  canvas.width = canvas.offsetWidth || 200;
+  canvas.height = canvas.offsetHeight || 46;
+  draw();
+}
+
+function drawFlatLine(deckId) {
+  const canvas = document.getElementById('viz' + deckId.toUpperCase());
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth || 200;
+  canvas.height = canvas.offsetHeight || 46;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const isA = deckId === 'a';
+  ctx.beginPath();
+  ctx.strokeStyle = isA ? 'rgba(137,180,250,0.25)' : 'rgba(203,166,247,0.25)';
+  ctx.lineWidth = 1;
+  ctx.moveTo(0, canvas.height / 2);
+  ctx.lineTo(canvas.width, canvas.height / 2);
+  ctx.stroke();
+}
+
+// ── File Drop ──────────────────────────────────
+
+function setupDropZone(deckId) {
+  const zone = document.getElementById('dropZone' + deckId.toUpperCase());
+  const deck = getDeck(deckId);
+
+  zone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    zone.classList.add('dragover');
+  });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    zone.textContent = 'Loading...';
+    zone.classList.remove('has-file');
+    try {
+      initAudioCtx();
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+      const ab = await file.arrayBuffer();
+      const audioBuffer = await audioCtx.decodeAudioData(ab);
+      deck.fileBuffer = audioBuffer;
+      deck.hasFile = true;
+      stopSynthScheduler(deck);
+      zone.textContent = file.name;
+      zone.classList.add('has-file');
+      // Hide stem toggles for file playback
+      document.getElementById('stemRow' + deckId.toUpperCase()).style.opacity = '0.3';
+      document.getElementById('stemRow' + deckId.toUpperCase()).style.pointerEvents = 'none';
+      initDeckNodes(deck);
+      if (deck.playing) startFilePlayback(deck);
+    } catch (err) {
+      zone.textContent = 'Error loading file';
+      console.error(err);
+    }
+  });
+}
+
+function setupDeckCardDrop(deckId) {
+  const panel = document.getElementById('deck' + deckId.toUpperCase() + 'El');
+  if (!panel) return;
+  panel.addEventListener('dragover', (e) => {
+    if (e.dataTransfer.types.includes('text/song-id')) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      panel.classList.add('deck-drag-over');
+    }
+  });
+  panel.addEventListener('dragleave', (e) => {
+    if (!panel.contains(e.relatedTarget)) panel.classList.remove('deck-drag-over');
+  });
+  panel.addEventListener('drop', (e) => {
+    const songId = e.dataTransfer.getData('text/song-id');
+    if (!songId) return; // let file drops fall through to the drop zone
+    e.preventDefault();
+    panel.classList.remove('deck-drag-over');
+    const song = SONGS.find(s => s.id === parseInt(songId));
+    if (song) loadSongToDeck(song, deckId);
+  });
+}
+
+// ══════════════════════════════════════════════
+// CAMELOT WHEEL (Canvas)
+// ══════════════════════════════════════════════
+function drawWheel(highlightedCamelots) {
+  const canvas = document.getElementById('camelotWheel');
+  const ctx = canvas.getContext('2d');
+  const cx = 120, cy = 120;
+  const innerR = 50, midR = 88, outerR = 115;
+  const segAngle = (Math.PI * 2) / 12;
+  const startOffset = -Math.PI / 2;
+
+  ctx.clearRect(0, 0, 240, 240);
+  ctx.beginPath();
+  ctx.arc(cx, cy, outerR + 4, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.03)';
+  ctx.fill();
+
+  for (let i = 1; i <= 12; i++) {
+    const startAngle = startOffset + (i - 1) * segAngle;
+    const endAngle = startAngle + segAngle;
+    const color = CAMELOT_COLORS[i.toString()];
+    const camelotA = `${i}A`, camelotB = `${i}B`;
+    const isAHighlighted = highlightedCamelots && highlightedCamelots.has(camelotA);
+    const isBHighlighted = highlightedCamelots && highlightedCamelots.has(camelotB);
+    const selectedSong = state.selectedId ? SONGS.find(s => s.id === state.selectedId) : null;
+    const isASelected = selectedSong?.camelot === camelotA;
+    const isBSelected = selectedSong?.camelot === camelotB;
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, midR, startAngle, endAngle);
+    ctx.closePath();
+    const alphaA = isASelected ? 0.95 : isAHighlighted ? 0.7 : 0.25;
+    ctx.fillStyle = color + Math.round(alphaA * 255).toString(16).padStart(2,'0');
+    ctx.fill();
+    ctx.strokeStyle = '#0b0b12';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, outerR, startAngle, endAngle);
+    ctx.arc(cx, cy, midR, endAngle, startAngle, true);
+    ctx.closePath();
+    const alphaB = isBSelected ? 0.95 : isBHighlighted ? 0.7 : 0.2;
+    ctx.fillStyle = color + Math.round(alphaB * 255).toString(16).padStart(2,'0');
+    ctx.fill();
+    ctx.strokeStyle = '#0b0b12';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    const midAngle = startAngle + segAngle / 2;
+    ctx.font = `bold 9px Inter, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const axA = cx + Math.cos(midAngle) * ((innerR + midR) / 2 + 4);
+    const ayA = cy + Math.sin(midAngle) * ((innerR + midR) / 2 + 4);
+    ctx.fillStyle = isASelected || isAHighlighted ? '#fff' : color + 'cc';
+    ctx.fillText(`${i}A`, axA, ayA);
+
+    const axB = cx + Math.cos(midAngle) * ((midR + outerR) / 2 + 1);
+    const ayB = cy + Math.sin(midAngle) * ((midR + outerR) / 2 + 1);
+    ctx.fillStyle = isBSelected || isBHighlighted ? '#fff' : color + 'cc';
+    ctx.fillText(`${i}B`, axB, ayB);
+  }
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
+  ctx.fillStyle = '#11111c';
+  ctx.fill();
+  ctx.strokeStyle = '#313244';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  const sel = state.selectedId ? SONGS.find(s => s.id === state.selectedId) : null;
+  if (sel) {
+    ctx.font = `bold 14px Inter, sans-serif`;
+    ctx.fillStyle = camelotColor(sel.camelot);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(sel.camelot, cx, cy - 4);
+    ctx.font = `9px Inter, sans-serif`;
+    ctx.fillStyle = '#585b70';
+    ctx.fillText(sel.key, cx, cy + 9);
+  } else {
+    ctx.font = `9px Inter, sans-serif`;
+    ctx.fillStyle = '#585b70';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('select', cx, cy - 4);
+    ctx.fillText('a track', cx, cy + 8);
+  }
+}
+
+// ══════════════════════════════════════════════
+// FILTER & SORT
+// ══════════════════════════════════════════════
+function getFilteredSongs() {
+  let songs = [...SONGS];
+  if (state.activeGenre !== 'All') {
+    songs = songs.filter(s => s.genre === state.activeGenre);
+  }
+  if (state.searchQuery) {
+    const q = state.searchQuery.toLowerCase();
+    songs = songs.filter(s =>
+      s.title.toLowerCase().includes(q) ||
+      s.artist.toLowerCase().includes(q) ||
+      s.key.toLowerCase().includes(q) ||
+      s.camelot.toLowerCase().includes(q) ||
+      s.genre.toLowerCase().includes(q)
+    );
+  }
+  songs.sort((a, b) => {
+    let av, bv;
+    if (state.sortBy === 'bpm') { av = a.bpm; bv = b.bpm; }
+    else if (state.sortBy === 'camelot') {
+      av = getCamelotNum(a.camelot) * 2 + (getCamelotLetter(a.camelot) === 'B' ? 1 : 0);
+      bv = getCamelotNum(b.camelot) * 2 + (getCamelotLetter(b.camelot) === 'B' ? 1 : 0);
+    }
+    else if (state.sortBy === 'energy') { av = a.energy; bv = b.energy; }
+    else { av = a.title.toLowerCase(); bv = b.title.toLowerCase(); }
+    if (av < bv) return -1 * state.sortDir;
+    if (av > bv) return 1 * state.sortDir;
+    return 0;
+  });
+  return songs;
+}
+
+// ══════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════
+function getCardClass(song, compatSet) {
+  if (!state.selectedId) return '';
+  if (song.id === state.selectedId) return 'selected';
+  if (compatSet && compatSet.has(song.camelot)) return 'compatible';
+  return 'incompatible';
+}
+
+function renderEnergyPips(energy, genre) {
+  const color = GENRE_PIP_COLORS[genre] || '#cba6f7';
+  return Array.from({length: 10}, (_, i) =>
+    `<div class="energy-pip ${i < energy ? 'on' : ''}" ${i < energy ? `style="--pip-color:${color}"` : ''}></div>`
+  ).join('');
+}
+
+function renderGenreBadge(genre) {
+  return `<span class="genre-badge genre-${CSS.escape(genre)}">${genre}</span>`;
+}
+
+function renderCards(songs, compatSet) {
+  if (!songs.length) {
+    return `<div class="empty-state"><div class="empty-icon">🔍</div><p>No tracks match your filters</p></div>`;
+  }
+  return songs.map(song => {
+    const cc = camelotColor(song.camelot);
+    const cls = getCardClass(song, compatSet);
+    return `
+    <div class="song-card ${cls}" data-id="${song.id}" draggable="true" style="--camelot-color:${cc}">
+      <div class="compat-indicator"></div>
+      <div class="card-top">
+        <div class="card-titles">
+          <div class="card-title">${escapeHtml(song.title)}</div>
+          <div class="card-artist">${escapeHtml(song.artist)}</div>
+        </div>
+        <div class="camelot-badge" style="--camelot-color:${cc}">${song.camelot}</div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item"><b>${song.bpm}</b>&nbsp;BPM</div>
+        <div class="meta-item" style="font-size:11px;color:var(--text2)">${escapeHtml(song.key)}</div>
+        ${renderGenreBadge(song.genre)}
+      </div>
+      <div class="energy-bar">${renderEnergyPips(song.energy, song.genre)}</div>
+      <div class="card-deck-btns">
+        <button class="deck-load-btn btn-a" data-load-deck="a" data-load-id="${song.id}">Load A</button>
+        <button class="deck-load-btn btn-b" data-load-deck="b" data-load-id="${song.id}">Load B</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTable(songs, compatSet) {
+  if (!songs.length) {
+    return `<div class="empty-state"><div class="empty-icon">🔍</div><p>No tracks match your filters</p></div>`;
+  }
+  const sortArrow = dir => dir > 0 ? ' ↑' : ' ↓';
+  const sa = (col) => state.sortBy === col ? ' sort-active' : '';
+  const header = `
+    <table class="song-table">
+    <thead><tr>
+      <th class="sortable${sa('title')}" data-sort="title">Title${state.sortBy==='title'?sortArrow(state.sortDir):''}</th>
+      <th>Artist</th>
+      <th class="sortable${sa('bpm')}" data-sort="bpm">BPM${state.sortBy==='bpm'?sortArrow(state.sortDir):''}</th>
+      <th>Key</th>
+      <th class="sortable${sa('camelot')}" data-sort="camelot">Camelot${state.sortBy==='camelot'?sortArrow(state.sortDir):''}</th>
+      <th class="sortable${sa('energy')}" data-sort="energy">Energy${state.sortBy==='energy'?sortArrow(state.sortDir):''}</th>
+      <th>Genre</th>
+      <th>Deck</th>
+    </tr></thead><tbody>`;
+
+  const rows = songs.map(song => {
+    const cc = camelotColor(song.camelot);
+    const cls = getCardClass(song, compatSet);
+    return `<tr class="${cls}" data-id="${song.id}">
+      <td class="title-cell">${escapeHtml(song.title)}</td>
+      <td class="artist-cell">${escapeHtml(song.artist)}</td>
+      <td><b>${song.bpm}</b></td>
+      <td style="font-size:12px;color:var(--text2)">${escapeHtml(song.key)}</td>
+      <td class="camelot-cell" style="--camelot-color:${cc}">${song.camelot}</td>
+      <td><div class="energy-bar">${renderEnergyPips(song.energy, song.genre)}</div></td>
+      <td>${renderGenreBadge(song.genre)}</td>
+      <td><div class="table-deck-btns">
+        <button class="deck-load-btn btn-a" data-load-deck="a" data-load-id="${song.id}">A</button>
+        <button class="deck-load-btn btn-b" data-load-deck="b" data-load-id="${song.id}">B</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  return header + rows + '</tbody></table>';
+}
+
+function renderSidebar(selectedSong, compatSet) {
+  const container = document.getElementById('sidebarContent');
+  if (!selectedSong) {
+    container.innerHTML = `<div class="no-selection"><div style="font-size:32px;margin-bottom:8px;opacity:0.3">🎵</div><p>Select a track to see<br>harmonic matches</p></div>`;
+    return;
+  }
+  const cc = camelotColor(selectedSong.camelot);
+  const compatSongs = SONGS.filter(s =>
+    s.id !== selectedSong.id && compatSet.has(s.camelot)
+  ).sort((a, b) => {
+    const order = { perfect: 0, relative: 1, adjacent: 2 };
+    return (order[compatType(selectedSong.camelot, a.camelot)] || 3) - (order[compatType(selectedSong.camelot, b.camelot)] || 3);
+  });
+
+  const compatItems = compatSongs.slice(0, 12).map(s => {
+    const type = compatType(selectedSong.camelot, s.camelot);
+    const dotColors = { perfect: '#f9e2af', relative: '#cba6f7', adjacent: '#a6e3a1' };
+    const dc = dotColors[type] || '#888';
+    const cc2 = camelotColor(s.camelot);
+    return `<div class="compat-song-item" data-id="${s.id}">
+      <div class="compat-dot" style="background:${dc};box-shadow:0 0 5px ${dc}"></div>
+      <div class="compat-name">${escapeHtml(s.title)}<br><span style="font-size:10px;color:var(--text3)">${escapeHtml(s.artist)}</span></div>
+      <div class="compat-badge" style="--camelot-color:${cc2}">${s.camelot}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="selected-panel">
+      <div class="selected-title">${escapeHtml(selectedSong.title)}</div>
+      <div class="selected-artist">${escapeHtml(selectedSong.artist)}</div>
+      <div class="selected-info">
+        <div class="info-box">
+          <div class="info-label">Camelot</div>
+          <div class="info-value camelot-val" style="--camelot-color:${cc}">${selectedSong.camelot}</div>
+        </div>
+        <div class="info-box">
+          <div class="info-label">BPM</div>
+          <div class="info-value">${selectedSong.bpm}</div>
+        </div>
+        <div class="info-box" style="grid-column:span 2">
+          <div class="info-label">Key</div>
+          <div class="info-value" style="font-size:13px">${escapeHtml(selectedSong.key)}</div>
+        </div>
+      </div>
+      <div class="compat-list">
+        <h4>Compatible tracks (${compatSongs.length})</h4>
+        <div style="display:flex;gap:10px;font-size:10px;color:var(--text3);margin-bottom:10px">
+          <span><span style="color:#f9e2af">●</span> Same key</span>
+          <span><span style="color:#cba6f7">●</span> Relative</span>
+          <span><span style="color:#a6e3a1">●</span> Adjacent</span>
+        </div>
+        ${compatItems || '<div style="color:var(--text3);font-size:12px;padding:8px 0">No compatible tracks found</div>'}
+      </div>
+    </div>`;
+
+  container.querySelectorAll('.compat-song-item[data-id]').forEach(el => {
+    el.addEventListener('click', () => selectSong(parseInt(el.dataset.id)));
+  });
+}
+
+function render() {
+  const filtered = getFilteredSongs();
+  const selectedSong = state.selectedId ? SONGS.find(s => s.id === state.selectedId) : null;
+  const compatSet = selectedSong ? getCompatibleCamelots(selectedSong.camelot) : null;
+  const compatInView = selectedSong
+    ? filtered.filter(s => s.id !== state.selectedId && compatSet.has(s.camelot)).length
+    : 0;
+
+  document.getElementById('totalCount').textContent = SONGS.length;
+  document.getElementById('visibleCount').textContent = filtered.length;
+  document.getElementById('compatCount').textContent = compatInView;
+  document.getElementById('songCountText').textContent = filtered.length;
+
+  const container = document.getElementById('songContainer');
+  if (state.viewMode === 'grid') {
+    container.innerHTML = `<div class="card-grid">${renderCards(filtered, compatSet)}</div>`;
+  } else {
+    container.innerHTML = renderTable(filtered, compatSet);
+  }
+
+  // Song card click (select)
+  container.querySelectorAll('[data-id]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('th')) return;
+      if (e.target.closest('.deck-load-btn')) return;
+      selectSong(parseInt(el.dataset.id));
+    });
+    // Drag song card to deck
+    el.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/song-id', el.dataset.id);
+      e.dataTransfer.effectAllowed = 'copy';
+      el.classList.add('dragging');
+    });
+    el.addEventListener('dragend', () => el.classList.remove('dragging'));
+  });
+
+  // Table header sort
+  container.querySelectorAll('th.sortable[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.sort;
+      if (state.sortBy === col) state.sortDir *= -1;
+      else { state.sortBy = col; state.sortDir = 1; }
+      updateSortBtns();
+      render();
+    });
+  });
+
+  // Deck load buttons
+  container.querySelectorAll('.deck-load-btn[data-load-deck]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const deckId = btn.dataset.loadDeck;
+      const songId = parseInt(btn.dataset.loadId);
+      const song = SONGS.find(s => s.id === songId);
+      if (song) loadSongToDeck(song, deckId);
+    });
+  });
+
+  drawWheel(compatSet);
+  renderSidebar(selectedSong, compatSet);
+}
+
+function selectSong(id) {
+  state.selectedId = state.selectedId === id ? null : id;
+  render();
+}
+
+function updateSortBtns() {
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.sort === state.sortBy);
+  });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════════
+// CONSOLE CONTROLS INIT
+// ══════════════════════════════════════════════
+function initConsoleControls() {
+  // Play buttons
+  document.getElementById('playBtnA').addEventListener('click', () => {
+    if (deckA.playing) pauseDeck(deckA); else playDeck(deckA);
+  });
+  document.getElementById('playBtnB').addEventListener('click', () => {
+    if (deckB.playing) pauseDeck(deckB); else playDeck(deckB);
+  });
+
+  // Pitch sliders
+  document.getElementById('pitchA').addEventListener('input', (e) => {
+    deckA.pitchMult = 1 + parseFloat(e.target.value) / 100;
+    updateBpmDisplay(deckA);
+    if (deckA.playing && !deckA.hasFile) {
+      stopSynthScheduler(deckA);
+      startSynthScheduler(deckA);
+    }
+    if (deckA.fileSource) deckA.fileSource.playbackRate.value = deckA.pitchMult;
+  });
+  document.getElementById('pitchB').addEventListener('input', (e) => {
+    deckB.pitchMult = 1 + parseFloat(e.target.value) / 100;
+    updateBpmDisplay(deckB);
+    if (deckB.playing && !deckB.hasFile) {
+      stopSynthScheduler(deckB);
+      startSynthScheduler(deckB);
+    }
+    if (deckB.fileSource) deckB.fileSource.playbackRate.value = deckB.pitchMult;
+  });
+
+  // EQ sliders
+  function bindEQ(deckId, bandId, filterNode) {
+    document.getElementById(bandId).addEventListener('input', (e) => {
+      const deck = getDeck(deckId);
+      if (deck[filterNode]) {
+        deck[filterNode].gain.setTargetAtTime(parseFloat(e.target.value), audioCtx ? audioCtx.currentTime : 0, 0.01);
+      }
+    });
+  }
+  bindEQ('a', 'eqAHi', 'highShelf');
+  bindEQ('a', 'eqAMid', 'peaking');
+  bindEQ('a', 'eqALow', 'lowShelf');
+  bindEQ('b', 'eqBHi', 'highShelf');
+  bindEQ('b', 'eqBMid', 'peaking');
+  bindEQ('b', 'eqBLow', 'lowShelf');
+
+  // Volume sliders
+  document.getElementById('volA').addEventListener('input', (e) => {
+    deckA.volume = parseFloat(e.target.value);
+    if (deckA.deckGain) deckA.deckGain.gain.setTargetAtTime(deckA.volume, audioCtx.currentTime, 0.01);
+  });
+  document.getElementById('volB').addEventListener('input', (e) => {
+    deckB.volume = parseFloat(e.target.value);
+    if (deckB.deckGain) deckB.deckGain.gain.setTargetAtTime(deckB.volume, audioCtx.currentTime, 0.01);
+  });
+
+  // Master volume
+  document.getElementById('masterVol').addEventListener('input', (e) => {
+    if (masterGainNode) masterGainNode.gain.setTargetAtTime(parseFloat(e.target.value), audioCtx.currentTime, 0.01);
+  });
+
+  // Crossfader
+  document.getElementById('crossfader').addEventListener('input', (e) => {
+    if (audioCtx) applyCrossfade(parseFloat(e.target.value));
+  });
+
+  // Sync button
+  document.getElementById('syncBtn').addEventListener('click', () => {
+    if (!deckA.song || !deckB.song) return;
+    const targetBpm = deckA.bpm * deckA.pitchMult;
+    const newMult = targetBpm / deckB.bpm;
+    const clampedMult = Math.max(0.92, Math.min(1.08, newMult));
+    deckB.pitchMult = clampedMult;
+    const pitchPct = (clampedMult - 1) * 100;
+    document.getElementById('pitchB').value = pitchPct.toFixed(1);
+    updateBpmDisplay(deckB);
+    if (deckB.playing && !deckB.hasFile) {
+      stopSynthScheduler(deckB);
+      startSynthScheduler(deckB);
+    }
+  });
+
+  // Stem buttons
+  document.querySelectorAll('.stem-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const deckId = btn.dataset.deck;
+      const stem = btn.dataset.stem;
+      const deck = getDeck(deckId);
+      deck.stems[stem] = !deck.stems[stem];
+      if (btn.classList.contains('active')) {
+        btn.classList.remove('active');
+        btn.classList.add('muted');
+        if (deck.stemGains[stem]) deck.stemGains[stem].gain.setTargetAtTime(0, audioCtx ? audioCtx.currentTime : 0, 0.05);
+      } else {
+        btn.classList.add('active');
+        btn.classList.remove('muted');
+        if (deck.stemGains[stem]) deck.stemGains[stem].gain.setTargetAtTime(1, audioCtx ? audioCtx.currentTime : 0, 0.05);
+      }
+    });
+  });
+
+  // Drop zones (audio files)
+  setupDropZone('a');
+  setupDropZone('b');
+  // Deck panels (song cards dragged from library)
+  setupDeckCardDrop('a');
+  setupDeckCardDrop('b');
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+function init() {
+  // Draw initial flat lines on visualizers
+  setTimeout(() => { drawFlatLine('a'); drawFlatLine('b'); }, 50);
+
+  // Genre filter pills
+  const genres = ['All', ...new Set(SONGS.map(s => s.genre))];
+  const filterContainer = document.getElementById('genreFilters');
+  filterContainer.innerHTML = genres.map(g =>
+    `<button class="pill ${g === state.activeGenre ? 'active' : ''}" data-genre="${g}">${g}</button>`
+  ).join('');
+
+  filterContainer.querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      state.activeGenre = pill.dataset.genre;
+      filterContainer.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      render();
+    });
+  });
+
+  // Sort buttons
+  document.querySelectorAll('.sort-btn[data-sort]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const col = btn.dataset.sort;
+      if (state.sortBy === col) state.sortDir *= -1;
+      else { state.sortBy = col; state.sortDir = 1; }
+      updateSortBtns();
+      render();
+    });
+  });
+
+  // Search
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    state.searchQuery = e.target.value;
+    render();
+  });
+
+  // View toggle
+  document.getElementById('gridViewBtn').addEventListener('click', () => {
+    state.viewMode = 'grid';
+    document.getElementById('gridViewBtn').classList.add('active');
+    document.getElementById('listViewBtn').classList.remove('active');
+    render();
+  });
+  document.getElementById('listViewBtn').addEventListener('click', () => {
+    state.viewMode = 'list';
+    document.getElementById('listViewBtn').classList.add('active');
+    document.getElementById('gridViewBtn').classList.remove('active');
+    render();
+  });
+
+  // Camelot wheel click
+  document.getElementById('camelotWheel').addEventListener('click', (e) => {
+    const canvas = e.currentTarget;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left - 120;
+    const y = e.clientY - rect.top - 120;
+    const r = Math.sqrt(x * x + y * y);
+    if (r < 50 || r > 115) return;
+    let angle = Math.atan2(y, x) + Math.PI / 2;
+    if (angle < 0) angle += Math.PI * 2;
+    const segment = Math.floor(angle / (Math.PI * 2 / 12)) + 1;
+    const letter = r < 88 ? 'A' : 'B';
+    const camelot = `${segment}${letter}`;
+    const filtered = getFilteredSongs();
+    const match = filtered.find(s => s.camelot === camelot);
+    if (match) selectSong(match.id);
+  });
+
+  // Console controls
+  initConsoleControls();
+
+  render();
+}
+
+init();
+
+// ══════════════════════════════════════════════════════════════════
+// SPOTIFY INTEGRATION
+// ══════════════════════════════════════════════════════════════════
+
+// ── Camelot / key mapping ──────────────────────────────────────────
+const KEY_CAMELOT = {
+  0:  ['Am','8A',  'C', '8B'],
+  1:  ['Bbm','3A', 'Db','3B'],
+  2:  ['Bm','10A', 'D','10B'],
+  3:  ['Cm','5A',  'Eb','5B'],
+  4:  ['C#m','12A','E','12B'],
+  5:  ['Dm','7A',  'F','7B'],
+  6:  ['Ebm','2A', 'F#','2B'],
+  7:  ['Em','9A',  'G','9B'],
+  8:  ['Fm','4A',  'Ab','4B'],
+  9:  ['F#m','11A','A','11B'],
+  10: ['Gm','6A',  'Bb','6B'],
+  11: ['Abm','1A', 'B','1B'],
+};
+
+function spotifyKeyToCamelot(key, mode) {
+  if (key < 0 || key > 11) return null;
+  const entry = KEY_CAMELOT[key];
+  if (!entry) return null;
+  return mode === 1 ? entry[3] : entry[1];
+}
+
+function spotifyKeyToName(key, mode) {
+  if (key < 0 || key > 11) return null;
+  const entry = KEY_CAMELOT[key];
+  if (!entry) return null;
+  const modeStr = mode === 1 ? 'major' : 'minor';
+  return (mode === 1 ? entry[2] : entry[0]) + ' ' + modeStr;
+}
+
+// ── PKCE helpers ───────────────────────────────────────────────────
+function generateCodeVerifier() {
+  const array = new Uint8Array(64);
+  crypto.getRandomValues(array);
+  return btoa(String.fromCharCode(...array))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+
+async function generateCodeChallenge(verifier) {
+  const data = new TextEncoder().encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+
+// ── Token storage ─────────────────────────────────────────────────
+function getSpotifyAuth() {
+  try {
+    const raw = localStorage.getItem('spotify_auth');
+    if (!raw) return null;
+    const auth = JSON.parse(raw);
+    if (!auth || !auth.access_token) return null;
+    if (Date.now() >= auth.expires_at) {
+      localStorage.removeItem('spotify_auth');
+      return null;
+    }
+    return auth;
+  } catch(e) { return null; }
+}
+
+function saveSpotifyAuth(auth) {
+  localStorage.setItem('spotify_auth', JSON.stringify(auth));
+}
+
+function clearSpotifyAuth() {
+  localStorage.removeItem('spotify_auth');
+}
+
+// ── Song cache ────────────────────────────────────────────────────
+function getSpotifySongCache() {
+  try {
+    const raw = localStorage.getItem('spotify_song_cache');
+    return raw ? JSON.parse(raw) : {};
+  } catch(e) { return {}; }
+}
+
+function saveSpotifySongCache(cache) {
+  try { localStorage.setItem('spotify_song_cache', JSON.stringify(cache)); } catch(e) {}
+}
+
+// ── OAuth flow ────────────────────────────────────────────────────
+async function startSpotifyOAuth(clientId) {
+  const verifier = generateCodeVerifier();
+  const challenge = await generateCodeChallenge(verifier);
+  const redirectUri = window.location.origin + window.location.pathname;
+
+  sessionStorage.setItem('spotify_code_verifier', verifier);
+  sessionStorage.setItem('spotify_client_id', clientId);
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    response_type: 'code',
+    redirect_uri: redirectUri,
+    code_challenge_method: 'S256',
+    code_challenge: challenge,
+    scope: 'user-read-private',
+    state: Math.random().toString(36).slice(2),
+  });
+
+  window.location.href = 'https://accounts.spotify.com/authorize?' + params.toString();
+}
+
+async function exchangeSpotifyCode(code) {
+  const verifier = sessionStorage.getItem('spotify_code_verifier');
+  const clientId = sessionStorage.getItem('spotify_client_id');
+  if (!verifier || !clientId) throw new Error('Missing PKCE state');
+
+  const redirectUri = window.location.origin + window.location.pathname;
+  const body = new URLSearchParams({
+    client_id: clientId,
+    grant_type: 'authorization_code',
+    code,
+    redirect_uri: redirectUri,
+    code_verifier: verifier,
+  });
+
+  const resp = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+  });
+
+  if (!resp.ok) throw new Error('Token exchange failed: ' + resp.status);
+  const data = await resp.json();
+  const auth = {
+    access_token: data.access_token,
+    expires_at: Date.now() + data.expires_in * 1000,
+    client_id: clientId,
+  };
+  saveSpotifyAuth(auth);
+  sessionStorage.removeItem('spotify_code_verifier');
+  sessionStorage.removeItem('spotify_client_id');
+
+  // Clean URL
+  const cleanUrl = window.location.origin + window.location.pathname;
+  history.replaceState({}, document.title, cleanUrl);
+
+  return auth;
+}
+
+// ── API helpers ───────────────────────────────────────────────────
+async function spotifyGet(url) {
+  const auth = getSpotifyAuth();
+  if (!auth) throw new Error('Not authenticated');
+  const resp = await fetch(url, {
+    headers: { 'Authorization': 'Bearer ' + auth.access_token }
+  });
+  if (resp.status === 401) {
+    clearSpotifyAuth();
+    renderSpotifyUI();
+    throw new Error('Spotify token expired (401)');
+  }
+  if (!resp.ok) throw new Error('Spotify API error: ' + resp.status);
+  return resp.json();
+}
+
+async function searchSpotifyTrack(title, artist) {
+  const q = encodeURIComponent(`track:"${title}" artist:"${artist}"`);
+  const data = await spotifyGet(
+    `https://api.spotify.com/v1/search?q=${q}&type=track&limit=1`
+  );
+  const item = data?.tracks?.items?.[0];
+  if (!item) return null;
+  return {
+    spotifyId: item.id,
+    previewUrl: item.preview_url || null,
+    externalUrl: item.external_urls?.spotify || null,
+  };
+}
+
+async function fetchAudioFeaturesBatch(ids) {
+  if (!ids.length) return [];
+  const data = await spotifyGet(
+    `https://api.spotify.com/v1/audio-features?ids=${ids.join(',')}`
+  );
+  return data?.audio_features || [];
+}
+
+// ── Progress UI ───────────────────────────────────────────────────
+function setProgress(current, total) {
+  const bar = document.getElementById('spotifyProgressBar');
+  const fill = document.getElementById('spotifyProgressFill');
+  const label = document.getElementById('spotifyProgressLabel');
+  if (total === 0) {
+    bar.style.display = 'none';
+    label.style.display = 'none';
+    return;
+  }
+  bar.style.display = 'block';
+  label.style.display = '';
+  const pct = Math.round((current / total) * 100);
+  fill.style.width = pct + '%';
+  label.textContent = `Loading previews ${current}/${total}...`;
+}
+
+function clearProgress() {
+  setProgress(0, 0);
+}
+
+// ── Toast ─────────────────────────────────────────────────────────
+function showToast(msg, duration = 3000) {
+  const el = document.getElementById('toastEl');
+  el.textContent = msg;
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), duration);
+}
+
+// ── Load Spotify data for all SONGS ──────────────────────────────
+async function loadSpotifyDataForSongs() {
+  const auth = getSpotifyAuth();
+  if (!auth) return;
+
+  const cache = getSpotifySongCache();
+  const songsNeedingSearch = SONGS.filter(s => !cache[s.id]);
+  if (!songsNeedingSearch.length) {
+    applyCacheToSongs(cache);
+    render();
+    return;
+  }
+
+  const BATCH = 5;
+  const DELAY = 100;
+  let loaded = 0;
+  const total = songsNeedingSearch.length;
+  setProgress(loaded, total);
+
+  // Process search in batches
+  for (let i = 0; i < songsNeedingSearch.length; i += BATCH) {
+    const batch = songsNeedingSearch.slice(i, i + BATCH);
+    await Promise.all(batch.map(async (song) => {
+      try {
+        const result = await searchSpotifyTrack(song.title, song.artist);
+        cache[song.id] = result || { spotifyId: null, previewUrl: null };
+      } catch(e) {
+        cache[song.id] = { spotifyId: null, previewUrl: null };
+      }
+    }));
+    loaded = Math.min(loaded + BATCH, total);
+    setProgress(loaded, total);
+    saveSpotifySongCache(cache);
+    if (i + BATCH < songsNeedingSearch.length) {
+      await new Promise(r => setTimeout(r, DELAY));
+    }
+  }
+
+  // Now batch-fetch audio features for tracks that have IDs
+  const idsToFetch = [];
+  SONGS.forEach(song => {
+    const entry = cache[song.id];
+    if (entry && entry.spotifyId && !entry.audioFeaturesLoaded) {
+      idsToFetch.push({ songId: song.id, spotifyId: entry.spotifyId });
+    }
+  });
+
+  if (idsToFetch.length) {
+    const FEAT_BATCH = 50; // API supports up to 100
+    for (let i = 0; i < idsToFetch.length; i += FEAT_BATCH) {
+      const slice = idsToFetch.slice(i, i + FEAT_BATCH);
+      try {
+        const features = await fetchAudioFeaturesBatch(slice.map(x => x.spotifyId));
+        slice.forEach((item, idx) => {
+          const feat = features[idx];
+          if (feat) {
+            cache[item.songId].bpm = Math.round(feat.tempo);
+            cache[item.songId].key = spotifyKeyToName(feat.key, feat.mode);
+            cache[item.songId].camelot = spotifyKeyToCamelot(feat.key, feat.mode);
+            cache[item.songId].energy = Math.round(feat.energy * 10);
+            cache[item.songId].audioFeaturesLoaded = true;
+          }
+        });
+      } catch(e) { /* ignore, keep existing data */ }
+      if (i + FEAT_BATCH < idsToFetch.length) {
+        await new Promise(r => setTimeout(r, DELAY));
+      }
+    }
+    saveSpotifySongCache(cache);
+  }
+
+  applyCacheToSongs(cache);
+  clearProgress();
+  render();
+}
+
+function applyCacheToSongs(cache) {
+  SONGS.forEach(song => {
+    const entry = cache[song.id];
+    if (!entry) return;
+    if (entry.spotifyId) song.spotifyId = entry.spotifyId;
+    if (entry.previewUrl !== undefined) song.previewUrl = entry.previewUrl;
+    if (entry.bpm) song.bpm = entry.bpm;
+    if (entry.key) song.key = entry.key;
+    if (entry.camelot) song.camelot = entry.camelot;
+    if (entry.energy) song.energy = entry.energy;
+  });
+}
+
+// ── Discover Tracks ───────────────────────────────────────────────
+function inferGenre(feat) {
+  if (feat.energy > 0.8 && feat.danceability > 0.8) return 'House';
+  if (feat.energy > 0.7 && feat.acousticness < 0.1) return 'Dance';
+  return 'Pop';
+}
+
+async function discoverTracks() {
+  const auth = getSpotifyAuth();
+  if (!auth) return;
+
+  const btn = document.querySelector('.spotify-discover-btn');
+  if (btn) { btn.textContent = 'Discovering...'; btn.disabled = true; }
+
+  try {
+    const data = await spotifyGet(
+      'https://api.spotify.com/v1/recommendations?seed_genres=dance,house,hip-hop,pop,r-n-b&limit=50&min_energy=0.75&min_danceability=0.65&target_popularity=85'
+    );
+    const tracks = data?.tracks || [];
+    if (!tracks.length) throw new Error('No tracks returned');
+
+    // Fetch audio features for all discovered tracks
+    const ids = tracks.map(t => t.id).filter(Boolean);
+    let features = [];
+    try {
+      features = await fetchAudioFeaturesBatch(ids);
+    } catch(e) {}
+
+    // Remove previously discovered tracks (ids >= 1000)
+    const originalSongs = SONGS.filter(s => s.id < 1000);
+    SONGS.length = 0;
+    originalSongs.forEach(s => SONGS.push(s));
+
+    tracks.forEach((track, i) => {
+      const feat = features[i];
+      if (!feat) return;
+      const camelot = spotifyKeyToCamelot(feat.key, feat.mode) || '8A';
+      const keyName = spotifyKeyToName(feat.key, feat.mode) || 'A minor';
+      const modeStr = feat.mode === 1 ? 'major' : 'minor';
+      const genre = inferGenre(feat);
+      const bpm = Math.round(feat.tempo);
+      const energy = Math.round(feat.energy * 10);
+      const artists = track.artists || [];
+      const artistName = artists[0]?.name || 'Unknown';
+
+      SONGS.push({
+        id: 1000 + i,
+        title: track.name,
+        artist: artistName,
+        bpm,
+        key: keyName,
+        camelot,
+        energy,
+        genre,
+        previewUrl: track.preview_url || null,
+        spotifyId: track.id,
+      });
+    });
+
+    render();
+    showToast(`Discovered ${tracks.length} new tracks!`);
+  } catch(e) {
+    console.error('Discover tracks error:', e);
+    showToast('Could not discover tracks. Try again.');
+  } finally {
+    if (btn) { btn.textContent = 'Discover Tracks'; btn.disabled = false; }
+  }
+}
+
+// ── Spotify UI rendering ──────────────────────────────────────────
+function renderSpotifyUI() {
+  const area = document.getElementById('spotifyArea');
+  if (!area) return;
+  const auth = getSpotifyAuth();
+
+  if (auth) {
+    area.innerHTML = `
+      <div class="spotify-connected-area">
+        <span class="spotify-connected-label">● Spotify Connected</span>
+        <button class="spotify-discover-btn" id="spotifyDiscoverBtn">Discover Tracks</button>
+      </div>`;
+    document.getElementById('spotifyDiscoverBtn').addEventListener('click', discoverTracks);
+  } else {
+    area.innerHTML = `
+      <button class="spotify-connect-btn" id="spotifyConnectShowBtn">Connect Spotify</button>
+      <div class="spotify-setup-panel" id="spotifySetupPanel" style="display:none">
+        <input type="text" class="spotify-client-input" id="spotifyClientIdInput" placeholder="Paste your Spotify Client ID">
+        <button class="spotify-auth-btn" id="spotifyAuthBtn">Connect</button>
+        <div class="spotify-redirect-hint" id="spotifyRedirectHint">Redirect URI: <span id="spotifyRedirectUri"></span></div>
+      </div>`;
+
+    document.getElementById('spotifyConnectShowBtn').addEventListener('click', () => {
+      const panel = document.getElementById('spotifySetupPanel');
+      const isVisible = panel.style.display !== 'none';
+      panel.style.display = isVisible ? 'none' : 'flex';
+      document.getElementById('spotifyRedirectUri').textContent =
+        window.location.origin + window.location.pathname;
+    });
+
+    document.getElementById('spotifyAuthBtn').addEventListener('click', async () => {
+      const clientId = document.getElementById('spotifyClientIdInput').value.trim();
+      if (!clientId) {
+        alert('Please enter your Spotify Client ID.');
+        return;
+      }
+      try {
+        await startSpotifyOAuth(clientId);
+      } catch(e) {
+        console.error('OAuth start error:', e);
+        alert('Could not start Spotify authentication. Check console for details.');
+      }
+    });
+  }
+}
+
+function renderSpotifyReconnectUI() {
+  const area = document.getElementById('spotifyArea');
+  if (!area) return;
+  clearSpotifyAuth();
+  area.innerHTML = `
+    <button class="spotify-reconnect-btn" id="spotifyReconnectBtn">Reconnect Spotify</button>`;
+  document.getElementById('spotifyReconnectBtn').addEventListener('click', () => {
+    renderSpotifyUI();
+  });
+}
+
+// ── Preview playback integration ──────────────────────────────────
+async function prefetchPreviewForDeck(deck, song) {
+  if (!song || !song.previewUrl) {
+    deck.previewAudioBuffer = null;
+    return;
+  }
+  try {
+    const resp = await fetch(song.previewUrl);
+    if (!resp.ok) throw new Error('Preview fetch failed');
+    const ab = await resp.arrayBuffer();
+    initAudioCtx();
+    deck.previewAudioBuffer = await audioCtx.decodeAudioData(ab);
+  } catch(e) {
+    deck.previewAudioBuffer = null;
+  }
+}
+
+function startPreviewPlayback(deck) {
+  if (!deck.previewAudioBuffer) return false;
+  if (deck.previewSource) {
+    try { deck.previewSource.stop(); } catch(e){}
+    deck.previewSource = null;
+  }
+  const src = audioCtx.createBufferSource();
+  src.buffer = deck.previewAudioBuffer;
+  src.loop = true;
+  src.connect(deck.analyser);
+  src.start();
+  deck.previewSource = src;
+  return true;
+}
+
+function stopPreviewPlayback(deck) {
+  if (deck.previewSource) {
+    try { deck.previewSource.stop(); } catch(e){}
+    deck.previewSource = null;
+  }
+}
+
+// ── Update source label on deck ───────────────────────────────────
+function updateDeckSourceLabel(deckId, type) {
+  const label = document.getElementById('deck' + deckId.toUpperCase() + 'SourceLabel');
+  if (!label) return;
+  if (!type) {
+    label.style.display = 'none';
+    return;
+  }
+  label.style.display = '';
+  label.className = 'deck-source-label ' + type;
+  label.textContent = type === 'spotify' ? '30s Preview' : 'Synthesized';
+}
+
+// ── Patch loadSongToDeck to handle previews ───────────────────────
+const _origLoadSongToDeck = loadSongToDeck;
+loadSongToDeck = function(song, deckId) {
+  _origLoadSongToDeck(song, deckId);
+  const deck = getDeck(deckId);
+
+  // Reset preview state
+  stopPreviewPlayback(deck);
+  deck.previewAudioBuffer = null;
+  deck.previewSource = null;
+
+  // Update source label
+  if (song.previewUrl) {
+    updateDeckSourceLabel(deckId, 'spotify');
+    prefetchPreviewForDeck(deck, song);
+  } else {
+    updateDeckSourceLabel(deckId, 'synth');
+  }
+};
+
+// ── Patch playDeck to use preview when available ──────────────────
+const _origPlayDeck = playDeck;
+playDeck = function(deck) {
+  initAudioCtx();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  initDeckNodes(deck);
+  deck.playing = true;
+  updatePlayBtn(deck);
+
+  if (deck.hasFile && deck.fileBuffer) {
+    startFilePlayback(deck);
+  } else if (deck.previewAudioBuffer) {
+    startPreviewPlayback(deck);
+  } else if (deck.song && deck.song.previewUrl && !deck.previewAudioBuffer) {
+    // Preview not fetched yet — try to fetch and play, fall back to synth
+    prefetchPreviewForDeck(deck, deck.song).then(() => {
+      if (deck.playing && deck.previewAudioBuffer) {
+        startPreviewPlayback(deck);
+      } else if (deck.playing && deck.song) {
+        startSynthScheduler(deck);
+      }
+    });
+  } else if (deck.song) {
+    startSynthScheduler(deck);
+  }
+  startVisualizer(deck);
+};
+
+// ── Patch pauseDeck to stop preview ──────────────────────────────
+const _origPauseDeck = pauseDeck;
+pauseDeck = function(deck) {
+  _origPauseDeck(deck);
+  stopPreviewPlayback(deck);
+};
+
+// ── Render: add preview badge to cards ───────────────────────────
+const _origRenderCards = renderCards;
+renderCards = function(songs, compatSet) {
+  if (!songs.length) {
+    return `<div class="empty-state"><div class="empty-icon">🔍</div><p>No tracks match your filters</p></div>`;
+  }
+  return songs.map(song => {
+    const cc = camelotColor(song.camelot);
+    const cls = getCardClass(song, compatSet);
+    const previewBadge = song.previewUrl
+      ? `<span class="preview-badge">&#9654; Preview</span>`
+      : '';
+    return `
+    <div class="song-card ${cls}" data-id="${song.id}" draggable="true" style="--camelot-color:${cc}">
+      <div class="compat-indicator"></div>
+      <div class="card-top">
+        <div class="card-titles">
+          <div class="card-title">${escapeHtml(song.title)}</div>
+          <div class="card-artist">${escapeHtml(song.artist)}</div>
+        </div>
+        <div class="camelot-badge" style="--camelot-color:${cc}">${song.camelot}</div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item"><b>${song.bpm}</b>&nbsp;BPM</div>
+        <div class="meta-item" style="font-size:11px;color:var(--text2)">${escapeHtml(song.key)}</div>
+        ${renderGenreBadge(song.genre)}
+        ${previewBadge}
+      </div>
+      <div class="energy-bar">${renderEnergyPips(song.energy, song.genre)}</div>
+      <div class="card-deck-btns">
+        <button class="deck-load-btn btn-a" data-load-deck="a" data-load-id="${song.id}">Load A</button>
+        <button class="deck-load-btn btn-b" data-load-deck="b" data-load-id="${song.id}">Load B</button>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+// ── On-page-load: handle OAuth callback or restore auth ───────────
+async function initSpotify() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+
+  if (code) {
+    try {
+      await exchangeSpotifyCode(code);
+    } catch(e) {
+      console.error('Spotify code exchange failed:', e);
+      // Clean URL anyway
+      history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+    }
+  }
+
+  // Apply song cache immediately (even if not fully loaded yet)
+  const cache = getSpotifySongCache();
+  if (Object.keys(cache).length) {
+    applyCacheToSongs(cache);
+    render();
+  }
+
+  renderSpotifyUI();
+
+  // If authenticated, start loading Spotify data
+  if (getSpotifyAuth()) {
+    loadSpotifyDataForSongs();
+  }
+}
+
+initSpotify();
+</script>
+</body>
+</html>
